@@ -35,6 +35,8 @@
                         <option value="deepseek">加载中...</option>
                     </select>
                     <button id="ttsBtn" class="btn-tts active" onclick="toggleTTS()" title="语音播报">🔊</button>
+                    <button id="voiceBtn" class="btn-voice" onclick="toggleVoice()" title="语音输入">🎤</button>
+                    <button id="autoBtn" class="btn-auto" onclick="toggleAutoChat()" title="自动语音聊天">🔄</button>
                     <button onclick="summarizeChat()" title="生成摘要">📝 摘要</button>
                     <button onclick="clearChat()">清空</button>
                     <select id="exportFormat" class="llm-select">
@@ -123,6 +125,6 @@
         </div>
     </div>
 
-    <script src="/static/js/app.js"></script>
+    <script type="module" src="/static/js/app.js"></script>
 </body>
 </html>

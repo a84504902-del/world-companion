@@ -2,6 +2,9 @@
 import json
 import math
 import threading
+import logging
+
+logger = logging.getLogger("embedding")
 
 _model = None
 _model_lock = threading.Lock()
@@ -22,12 +25,12 @@ def load_model():
         _model_loading = True
         try:
             from sentence_transformers import SentenceTransformer
-            print("[embedding] 加载嵌入模型 all-MiniLM-L6-v2 ...")
+            logger.info("加载嵌入模型 all-MiniLM-L6-v2 ...")
             _model = SentenceTransformer("all-MiniLM-L6-v2")
             _model_ready = True
-            print("[embedding] 模型加载完成")
+            logger.info("模型加载完成")
         except Exception as e:
-            print(f"[embedding] 模型加载失败: {e}")
+            logger.error("模型加载失败: %s", e)
             _model = None
         finally:
             _model_loading = False
@@ -47,7 +50,7 @@ def embed_text(text):
         vec = model.encode(text, normalize_embeddings=True)
         return vec.tolist()
     except Exception as e:
-        print(f"[embedding] embed_text 失败: {e}")
+        logger.error("embed_text 失败: %s", e)
         return []
 
 
@@ -60,7 +63,7 @@ def embed_batch(texts):
         vecs = model.encode(texts, normalize_embeddings=True, batch_size=32)
         return [v.tolist() for v in vecs]
     except Exception as e:
-        print(f"[embedding] embed_batch 失败: {e}")
+        logger.error("embed_batch 失败: %s", e)
         return [[] for _ in texts]
 
 

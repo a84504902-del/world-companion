@@ -211,6 +211,39 @@ body {
     background: var(--bg-active);
 }
 
+.btn-voice {
+    padding: 6px 10px;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+.btn-voice.listening {
+    background: #c026d3;
+    animation: pulse 1s infinite;
+}
+
+.btn-auto {
+    padding: 6px 10px;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+.btn-auto.active {
+    background: #059669 !important;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
 .chat-actions button {
     padding: 6px 12px;
     background: var(--bg-card);
@@ -816,4 +849,24 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
     background: var(--bg-active);
+}
+
+/* 流式输出光标 */
+.streaming-cursor {
+    animation: blink 0.8s infinite;
+    color: #888;
+    font-weight: bold;
+}
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+.memory-tag {
+    background: #2a2a3a;
+    color: #aaa;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+    margin: 0 4px;
 }

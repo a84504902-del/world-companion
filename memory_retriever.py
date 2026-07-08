@@ -1,7 +1,11 @@
 """记忆检索模块 — 事实提取 + 向量语义检索"""
 import asyncio
+import logging
+
 import db
 import embedding
+
+logger = logging.getLogger("retriever")
 
 
 # 内存中的向量缓存: [{id, memory_id, embedding, content, tags, session_id}]
@@ -29,9 +33,9 @@ def preload_cache():
                     "session_id": r["session_id"] or ""
                 })
         _cache_loaded = True
-        print(f"[retriever] 向量缓存预加载完成: {len(_vector_cache)} 条")
+        logger.info("向量缓存预加载完成: %d 条", len(_vector_cache))
     except Exception as e:
-        print(f"[retriever] 向量缓存预加载失败: {e}")
+        logger.error("向量缓存预加载失败: %s", e)
         _cache_loaded = True
 
 
@@ -108,7 +112,7 @@ def store_memory_with_embedding(content, tags="", session_id=""):
         emb_json = embedding.vector_to_json(vec)
         db.save_memory_embedding(memory_id, emb_json, content)
         add_to_cache(memory_id, vec, content, tags, session_id)
-        print(f"[retriever] 记忆已存储+向量化: id={memory_id}, session={session_id[:20]}, content={content[:30]}...")
+        logger.info("记忆已存储+向量化: id=%s, session=%s, content=%s...", memory_id, session_id[:20], content[:30])
 
     return memory_id
 
@@ -143,7 +147,7 @@ def extract_facts_from_conversation(user_text, assistant_text, llm_call_func):
                 facts.append(line[2:].strip())
         return facts[:4]
     except Exception as e:
-        print(f"[retriever] 事实提取失败: {e}")
+        logger.error("事实提取失败: %s", e)
         return []
 
 
@@ -160,5 +164,5 @@ def auto_extract_and_store(user_text, assistant_text, llm_call_func, session_id=
             count += 1
 
     if count > 0:
-        print(f"[retriever] 自动提取并存储了 {count} 条事实")
+        logger.info("自动提取并存储了 %d 条事实", count)
     return count

@@ -1,14 +1,22 @@
 """AI Companion - 主应用入口"""
 import os
+import shutil
 import asyncio
 import threading
+import logging
+from datetime import datetime
+
 from aiohttp import web
 
-import db
 import config
+import db
 import embedding
 import memory_retriever
+from log import setup_logging
 from routes import chat, memory, person, relation, admin, custom_llm, template
+
+setup_logging()
+logger = logging.getLogger("app")
 
 
 async def index_handler(request):
@@ -40,9 +48,44 @@ async def audio_handler(request):
         return web.Response(status=404, text="音频不存在")
 
 
+def backup_database():
+    """备份数据库文件"""
+    if not os.path.exists(config.DB_PATH):
+        return
+    backup_dir = os.path.join(config.BASE_DIR, "backups")
+    os.makedirs(backup_dir, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    backup_path = os.path.join(backup_dir, f"memory_{timestamp}.db")
+    try:
+        shutil.copy2(config.DB_PATH, backup_path)
+        # 只保留最近 7 个备份
+        backups = sorted(
+            [f for f in os.listdir(backup_dir) if f.startswith("memory_") and f.endswith(".db")]
+        )
+        while len(backups) > 7:
+            old = backups.pop(0)
+            os.remove(os.path.join(backup_dir, old))
+        logger.info("数据库已备份: %s", backup_path)
+    except Exception as e:
+        logger.error("数据库备份失败: %s", e)
+
+
+async def backup_handler(request):
+    """手动触发数据库备份"""
+    try:
+        backup_database()
+        return web.json_response({"ok": True})
+    except Exception as e:
+        return web.json_response({"error": str(e)}, status=500)
+
+
 def create_app():
     """创建应用"""
     app = web.Application()
+
+    async def on_cleanup(app):
+        db.close_conn()
+    app.on_cleanup.append(on_cleanup)
 
     # 主页
     app.router.add_get("/", index_handler)
@@ -74,6 +117,8 @@ def create_app():
     app.router.add_get("/memories", memory.list_memories)
     app.router.add_post("/api/save_memory", memory.save_memory)
     app.router.add_post("/delete_memory", memory.delete_memory)
+    app.router.add_post("/api/save_memory_from_message", memory.save_from_message)
+    app.router.add_post("/api/memory/update_weight", memory.update_weight)
 
     # 人物
     app.router.add_get("/api/people/list", person.list_people)
@@ -107,6 +152,9 @@ def create_app():
     app.router.add_post("/api/templates/update", template.update_template)
     app.router.add_post("/api/templates/delete", template.delete_template)
 
+    # 数据库备份
+    app.router.add_post("/api/database/backup", backup_handler)
+
     # 静态文件
     app.router.add_static("/static", os.path.join(config.BASE_DIR, "static"))
 
@@ -122,13 +170,16 @@ def _init_embedding_background():
             # 预加载后重新构建缓存（如果有新记忆需要向量化）
             memory_retriever.preload_cache()
     except Exception as e:
-        print(f"[app] 嵌入初始化失败: {e}")
+        logger.error("嵌入初始化失败: %s", e)
 
 
 def main():
     """启动应用"""
     # 初始化数据库
     db.init_db()
+
+    # 备份数据库
+    backup_database()
 
     # 创建默认会话
     sessions = db.get_all_sessions()
@@ -140,9 +191,9 @@ def main():
     else:
         chat._current_session_id = sessions[0]["id"]
 
-    print(f"AI Companion 启动中...")
-    print(f"访问地址: http://localhost:{config.PORT}")
-    print(f"数据库: {config.DB_PATH}")
+    logger.info("AI Companion 启动中...")
+    logger.info("访问地址: http://localhost:%s", config.PORT)
+    logger.info("数据库: %s", config.DB_PATH)
 
     # 后台初始化嵌入模型（不阻塞启动）
     threading.Thread(target=_init_embedding_background, daemon=True).start()

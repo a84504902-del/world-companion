@@ -246,3 +246,75 @@ def get_llm_chat_func(llm_id):
             return openai_chat
 
     return None
+
+
+def get_llm_stream_func(llm_id):
+    """获取 LLM 流式调用函数，不支持流式则返回 None"""
+    data = load_llm_config()
+    for m in data.get("llms", []):
+        if m.get("id") == llm_id:
+            api_key = m.get("api_key", "")
+            base_url = m.get("base_url", "")
+            model = m.get("model", "")
+
+            # 百度不支持流式
+            if "baidubce.com" in base_url:
+                return None
+
+            # Ollama 流式
+            if "localhost:11434" in base_url or "127.0.0.1:11434" in base_url:
+                def ollama_stream(messages, base_url=base_url, model=model):
+                    """流式调用 Ollama，yield 文本片段"""
+                    msg_data = json.dumps({
+                        "model": model,
+                        "messages": messages,
+                        "stream": True
+                    }).encode("utf-8")
+                    req = urllib.request.Request(base_url, data=msg_data, headers={"Content-Type": "application/json"})
+                    with urllib.request.urlopen(req, timeout=120) as resp:
+                        for line in resp:
+                            line = line.decode("utf-8").strip()
+                            if not line:
+                                continue
+                            try:
+                                chunk = json.loads(line)
+                                content = chunk.get("message", {}).get("content", "")
+                                if content:
+                                    yield content
+                                if chunk.get("done", False):
+                                    break
+                            except (json.JSONDecodeError, KeyError):
+                                continue
+                return ollama_stream
+
+            # OpenAI 兼容流式
+            def openai_stream(messages, base_url=base_url, api_key=api_key, model=model):
+                """流式调用 OpenAI 兼容接口，yield 文本片段"""
+                msg_data = json.dumps({
+                    "model": model,
+                    "messages": messages,
+                    "max_tokens": 500,
+                    "temperature": 0.8,
+                    "stream": True
+                }).encode("utf-8")
+                req = urllib.request.Request(
+                    base_url, data=msg_data,
+                    headers={"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"}
+                )
+                with urllib.request.urlopen(req, timeout=60) as resp:
+                    for line in resp:
+                        line = line.decode("utf-8").strip()
+                        if line.startswith("data: "):
+                            payload = line[6:]
+                            if payload.strip() == "[DONE]":
+                                break
+                            try:
+                                chunk = json.loads(payload)
+                                delta = chunk.get("choices", [{}])[0].get("delta", {})
+                                content = delta.get("content", "")
+                                if content:
+                                    yield content
+                            except (json.JSONDecodeError, KeyError, IndexError):
+                                continue
+            return openai_stream
+    return None
