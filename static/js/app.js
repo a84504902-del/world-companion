@@ -16,6 +16,7 @@ Object.assign(window, {
 
     // 聊天
     sendMessage: chat.sendMessage,
+    cancelGeneration: chat.cancelGeneration,
     playAudio: chat.playAudio,
     stopAudio: chat.stopAudio,
     saveMessageAsMemory: chat.saveMessageAsMemory,
@@ -54,7 +55,6 @@ document.addEventListener('DOMContentLoaded', () => {
     sessions.loadSessions();
     memory.loadCustomLLMs();
     setupTextarea();
-    tts.initSpeech();
 });
 
 function setupTextarea() {

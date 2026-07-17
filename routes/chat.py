@@ -2,9 +2,10 @@
 import json
 import hashlib
 import asyncio
+import threading
 import logging
 from datetime import datetime
-from aiohttp import web
+from aiohttp import web, ClientConnectionResetError
 
 import db
 import llm
@@ -19,6 +20,7 @@ class SessionState:
     def __init__(self):
         self.conversation_history = []
         self.message_count = 0
+        self.cancel_event = threading.Event()  # 打断信号
 
 
 # 按 session_id 隔离的会话状态缓存
@@ -94,7 +96,13 @@ async def chat_handler(request):
     resp.headers["Content-Type"] = "text/event-stream; charset=utf-8"
     resp.headers["Cache-Control"] = "no-cache"
     resp.headers["X-Accel-Buffering"] = "no"
-    await resp.prepare(request)
+
+    try:
+        await resp.prepare(request)
+    except (ClientConnectionResetError, ConnectionResetError, ConnectionError):
+        # 客户端已断开连接（如用户快速切换/发送新消息导致前端 abort）
+        logger.info("客户端在建立 SSE 连接前已断开")
+        return resp
 
     full_response = ""
 
@@ -107,42 +115,81 @@ async def chat_handler(request):
 
     if stream_gen is not None:
         # 流式：用 asyncio.Queue 桥接 executor 线程和 async handler
+        state.cancel_event.clear()
         loop = asyncio.get_event_loop()
         queue = asyncio.Queue()
 
         def _run_stream():
             try:
                 for chunk in stream_gen:
+                    if state.cancel_event.is_set():
+                        break
                     loop.call_soon_threadsafe(queue.put_nowait, ("chunk", chunk))
-                loop.call_soon_threadsafe(queue.put_nowait, ("done", None))
+                if not state.cancel_event.is_set():
+                    loop.call_soon_threadsafe(queue.put_nowait, ("done", None))
+                else:
+                    loop.call_soon_threadsafe(queue.put_nowait, ("cancelled", None))
             except Exception as e:
                 loop.call_soon_threadsafe(queue.put_nowait, ("error", str(e)))
 
         asyncio.get_event_loop().run_in_executor(None, _run_stream)
 
+        cancelled = False
         while True:
             kind, payload = await queue.get()
             if kind == "chunk":
                 full_response += payload
-                await resp.write(f"data: {json.dumps({'content': payload}, ensure_ascii=False)}\n\n".encode("utf-8"))
+                try:
+                    await resp.write(f"data: {json.dumps({'content': payload}, ensure_ascii=False)}\n\n".encode("utf-8"))
+                except (ClientConnectionResetError, ConnectionResetError, ConnectionError):
+                    cancelled = True
+                    break
             elif kind == "done":
                 break
+            elif kind == "cancelled":
+                cancelled = True
+                break
             elif kind == "error":
-                await resp.write(f"data: {json.dumps({'error': payload}, ensure_ascii=False)}\n\n".encode("utf-8"))
-                await resp.write_eof()
+                try:
+                    await resp.write(f"data: {json.dumps({'error': payload}, ensure_ascii=False)}\n\n".encode("utf-8"))
+                    await resp.write_eof()
+                except (ClientConnectionResetError, ConnectionResetError, ConnectionError):
+                    pass
                 return resp
     else:
         # 非流式回退
+        cancelled = False
         try:
             full_response = await asyncio.get_event_loop().run_in_executor(
                 None, lambda: llm.chat(text, mode, state.conversation_history,
                                        system_prompt=system_prompt, memory_text=memory_text)
             )
         except Exception as e:
-            await resp.write(f"data: {json.dumps({'error': f'LLM 调用失败: {e}'}, ensure_ascii=False)}\n\n".encode("utf-8"))
-            await resp.write_eof()
+            try:
+                await resp.write(f"data: {json.dumps({'error': f'LLM 调用失败: {e}'}, ensure_ascii=False)}\n\n".encode("utf-8"))
+                await resp.write_eof()
+            except (ClientConnectionResetError, ConnectionResetError, ConnectionError):
+                pass
             return resp
-        await resp.write(f"data: {json.dumps({'content': full_response}, ensure_ascii=False)}\n\n".encode("utf-8"))
+        try:
+            await resp.write(f"data: {json.dumps({'content': full_response}, ensure_ascii=False)}\n\n".encode("utf-8"))
+        except (ClientConnectionResetError, ConnectionResetError, ConnectionError):
+            cancelled = True
+
+    # 被打断时：保存已有内容，跳过 TTS 和摘要
+    if cancelled:
+        if full_response:
+            state.conversation_history.append({"role": "user", "content": text})
+            state.conversation_history.append({"role": "assistant", "content": full_response})
+            db.save_message(_current_session_id, "user", text)
+            db.save_message(_current_session_id, "assistant", full_response)
+            state.message_count += 2
+        try:
+            await resp.write(f"data: {json.dumps({'done': True, 'cancelled': True, 'audio_url': None, 'summary': None}, ensure_ascii=False)}\n\n".encode("utf-8"))
+            await resp.write_eof()
+        except (ClientConnectionResetError, ConnectionResetError, ConnectionError):
+            pass
+        return resp
 
     # 保存消息到数据库
     state.conversation_history.append({"role": "user", "content": text})
@@ -175,7 +222,11 @@ async def chat_handler(request):
 
     # 发送完成事件
     done_data = {"done": True, "audio_url": audio_url, "summary": summary}
-    await resp.write(f"data: {json.dumps(done_data, ensure_ascii=False)}\n\n".encode("utf-8"))
+    try:
+        await resp.write(f"data: {json.dumps(done_data, ensure_ascii=False)}\n\n".encode("utf-8"))
+        await resp.write_eof()
+    except (ClientConnectionResetError, ConnectionResetError, ConnectionError):
+        pass
 
     # 后台自动提取事实
     chat_func = get_llm_chat_func(mode)
@@ -186,7 +237,10 @@ async def chat_handler(request):
             )
         )
 
-    await resp.write_eof()
+    try:
+        await resp.write_eof()
+    except (ClientConnectionResetError, ConnectionResetError, ConnectionError):
+        pass
     return resp
 
 
@@ -495,3 +549,11 @@ async def summarize_handler(request):
         return web.json_response({"summary": summary})
     except Exception as e:
         return web.json_response({"error": f"生成摘要失败: {e}"}, status=500)
+
+
+async def cancel_chat_handler(request):
+    """打断当前正在进行的 LLM 生成"""
+    state = get_state(_current_session_id)
+    if state:
+        state.cancel_event.set()
+    return web.json_response({"ok": True})

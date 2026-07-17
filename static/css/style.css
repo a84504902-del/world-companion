@@ -870,3 +870,17 @@ body {
     font-size: 12px;
     margin: 0 4px;
 }
+
+/* 停止生成按钮（发送按钮在流式输出时变为停止按钮） */
+.btn-send.btn-stop-gen {
+    background: #c0392b;
+    color: #fff;
+    animation: pulse-stop 1.5s infinite;
+}
+.btn-send.btn-stop-gen:hover {
+    background: #e74c3c;
+}
+@keyframes pulse-stop {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(192, 57, 43, 0.4); }
+    50% { box-shadow: 0 0 0 6px rgba(192, 57, 43, 0); }
+}

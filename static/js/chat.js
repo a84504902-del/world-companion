@@ -1,6 +1,9 @@
 import * as state from './state.js';
 import { escapeHtml, renderMarkdown } from './utils.js';
 
+// 当前流式请求的 AbortController
+let abortController = null;
+
 export async function loadHistory() {
     try {
         const resp = await fetch('/history');
@@ -64,11 +67,58 @@ function finalizeStreamingMessage(div, fullText, audioUrl) {
     contentDiv.innerHTML = renderMarkdown(fullText) + `<div class="audio-btns">${audioBtns}</div>`;
 }
 
-// 发送消息（支持流式输出）
+// 显示/隐藏停止生成按钮
+function updateSendButton() {
+    const sendBtn = document.querySelector('.btn-send');
+    if (!sendBtn) return;
+    if (state.isStreaming) {
+        sendBtn.textContent = '停止';
+        sendBtn.classList.add('btn-stop-gen');
+        sendBtn.onclick = () => cancelGeneration();
+    } else {
+        sendBtn.textContent = '发送';
+        sendBtn.classList.remove('btn-stop-gen');
+        sendBtn.onclick = () => sendMessage();
+    }
+}
+
+// 打断生成：停止 LLM 流式输出 + 停止 TTS
+export async function cancelGeneration() {
+    // 停止 TTS
+    stopAudio();
+
+    // 中止流式请求
+    if (abortController) {
+        abortController.abort();
+        abortController = null;
+    }
+
+    // 通知后端取消
+    try {
+        await fetch('/api/cancel_chat', { method: 'POST' });
+    } catch (e) {
+        // 忽略
+    }
+
+    state.setIsStreaming(false);
+    updateSendButton();
+}
+
+// 发送消息（支持流式输出 + 打断）
 export async function sendMessage() {
     const input = document.getElementById('messageInput');
     const text = input.value.trim();
     if (!text) return;
+
+    // 如果正在生成中，先打断
+    if (state.isStreaming) {
+        await cancelGeneration();
+        // 短暂等待让中止生效
+        await new Promise(r => setTimeout(r, 100));
+    }
+
+    // 停止当前 TTS 播放
+    stopAudio();
 
     const mode = document.getElementById('llmSelect').value;
     input.value = '';
@@ -81,11 +131,17 @@ export async function sendMessage() {
     const msgDiv = streamEl.closest('.message');
     let fullResponse = '';
 
+    // 设置 AbortController
+    abortController = new AbortController();
+    state.setIsStreaming(true);
+    updateSendButton();
+
     try {
         const resp = await fetch('/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text, mode })
+            body: JSON.stringify({ text, mode }),
+            signal: abortController.signal
         });
 
         const reader = resp.body.getReader();
@@ -93,6 +149,7 @@ export async function sendMessage() {
         let buffer = '';
         let audioUrl = null;
         let summary = null;
+        let wasCancelled = false;
 
         while (true) {
             const { done, value } = await reader.read();
@@ -118,6 +175,7 @@ export async function sendMessage() {
                         if (eventData.done) {
                             audioUrl = eventData.audio_url;
                             summary = eventData.summary;
+                            wasCancelled = eventData.cancelled || false;
                         }
                     } catch (e) {
                         // 忽略 JSON 解析错误
@@ -126,22 +184,49 @@ export async function sendMessage() {
             }
         }
 
-        // 流完成，渲染最终 Markdown
-        finalizeStreamingMessage(msgDiv, fullResponse, audioUrl);
+        // 流完成
+        abortController = null;
+        state.setIsStreaming(false);
+        updateSendButton();
 
-        // 显示摘要
-        if (summary) {
-            appendMessage('assistant', `📝 **对话摘要：** ${summary}`);
-        }
-
-        // 自动播放 TTS
-        if (audioUrl && state.ttsEnabled) {
-            playAudio(audioUrl);
+        if (wasCancelled && fullResponse) {
+            // 被打断：显示已生成的部分
+            finalizeStreamingMessage(msgDiv, fullResponse + ' *(已打断)*', null);
+        } else if (wasCancelled && !fullResponse) {
+            // 还没生成内容就被打断：移除占位消息
+            msgDiv.remove();
+        } else {
+            // 正常完成
+            finalizeStreamingMessage(msgDiv, fullResponse, audioUrl);
+            if (summary) {
+                appendMessage('assistant', `📝 **对话摘要：** ${summary}`);
+            }
+            if (audioUrl && state.ttsEnabled) {
+                playAudio(audioUrl);
+            } else if (state.autoMode) {
+                // 没有音频或 TTS 未开启，但处于自动模式：延迟重启语音识别
+                setTimeout(() => {
+                    const { startAutoListen } = window;
+                    if (startAutoListen) startAutoListen();
+                }, 500);
+            }
         }
 
     } catch (e) {
-        streamEl.textContent = '发送失败: ' + e.message;
-        finalizeStreamingMessage(msgDiv, '发送失败: ' + e.message, null);
+        abortController = null;
+        state.setIsStreaming(false);
+        updateSendButton();
+
+        if (e.name === 'AbortError') {
+            // 用户主动取消
+            if (fullResponse) {
+                finalizeStreamingMessage(msgDiv, fullResponse + ' *(已打断)*', null);
+            } else {
+                msgDiv.remove();
+            }
+        } else {
+            finalizeStreamingMessage(msgDiv, '发送失败: ' + e.message, null);
+        }
     }
 }
 
@@ -175,7 +260,22 @@ export function playAudio(url) {
             if (startAutoListen) setTimeout(startAutoListen, 300);
         }
     };
-    audio.play().catch(e => console.log('播放失败:', e));
+    audio.onerror = () => {
+        console.error('音频播放失败');
+        state.setCurrentAudio(null);
+        if (state.autoMode) {
+            const { startAutoListen } = window;
+            if (startAutoListen) setTimeout(startAutoListen, 500);
+        }
+    };
+    audio.play().catch(e => {
+        console.log('播放失败:', e);
+        state.setCurrentAudio(null);
+        if (state.autoMode) {
+            const { startAutoListen } = window;
+            if (startAutoListen) setTimeout(startAutoListen, 500);
+        }
+    });
 }
 
 export function stopAudio() {

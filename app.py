@@ -13,7 +13,7 @@ import db
 import embedding
 import memory_retriever
 from log import setup_logging
-from routes import chat, memory, person, relation, admin, custom_llm, template
+from routes import chat, memory, person, relation, admin, custom_llm, template, stt
 
 setup_logging()
 logger = logging.getLogger("app")
@@ -81,7 +81,7 @@ async def backup_handler(request):
 
 def create_app():
     """创建应用"""
-    app = web.Application()
+    app = web.Application(client_max_size=10 * 1024 * 1024)
 
     async def on_cleanup(app):
         db.close_conn()
@@ -112,6 +112,7 @@ def create_app():
     app.router.add_get("/api/summarize", chat.summarize_handler)
     app.router.add_get("/api/search_chat", chat.search_chat_handler)
     app.router.add_post("/api/rename_session", chat.rename_session_handler)
+    app.router.add_post("/api/cancel_chat", chat.cancel_chat_handler)
 
     # 记忆
     app.router.add_get("/memories", memory.list_memories)
@@ -154,6 +155,9 @@ def create_app():
 
     # 数据库备份
     app.router.add_post("/api/database/backup", backup_handler)
+
+    # 语音识别
+    app.router.add_post("/api/stt", stt.speech_to_text)
 
     # 静态文件
     app.router.add_static("/static", os.path.join(config.BASE_DIR, "static"))
