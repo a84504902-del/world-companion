@@ -25,7 +25,9 @@ async def add_relation(request):
     if not person_a_id or not person_b_id or not relation_type:
         return web.json_response({"error": "参数不完整"}, status=400)
 
-    relation_id = db.add_relation(person_a_id, relation_type, person_b_id, session_id)
+    relation_id = db.add_relation(person_a_id, relation_type, person_b_id, session_id,
+                                  call_a_to_b=data.get("call_a_to_b", "").strip(),
+                                  call_b_to_a=data.get("call_b_to_a", "").strip())
     return web.json_response({"id": relation_id})
 
 

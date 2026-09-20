@@ -18,19 +18,22 @@ async def add_person(request):
         return web.json_response({"error": "无效的JSON"}, status=400)
 
     name = data.get("name", "").strip()
-    age = data.get("age", 0)
-    description = data.get("description", "")
     session_id = data.get("session_id", "")
 
     if not name:
         return web.json_response({"error": "名字不能为空"}, status=400)
 
-    person_id = db.add_person(name, age, description, session_id)
+    person_id = db.add_person(
+        name, age=data.get("age", 0), description=data.get("description", ""),
+        session_id=session_id,
+        birthday=data.get("birthday", ""), occupation=data.get("occupation", ""),
+        personality=data.get("personality", ""), speech_style=data.get("speech_style", ""),
+        likes=data.get("likes", ""), dislikes=data.get("dislikes", ""))
     return web.json_response({"id": person_id})
 
 
 async def update_person(request):
-    """更新人物"""
+    """更新人物（人物卡：只更新传入的字段）"""
     try:
         data = await request.json()
     except Exception:
@@ -42,10 +45,10 @@ async def update_person(request):
 
     db.update_person(
         person_id,
-        name=data.get("name"),
-        age=data.get("age"),
-        description=data.get("description")
-    )
+        name=data.get("name"), age=data.get("age"), description=data.get("description"),
+        birthday=data.get("birthday"), occupation=data.get("occupation"),
+        personality=data.get("personality"), speech_style=data.get("speech_style"),
+        likes=data.get("likes"), dislikes=data.get("dislikes"))
     return web.json_response({"ok": True})
 
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Companion - 夏雪</title>
+    <title>World Companion - 夏雪</title>
     <link rel="stylesheet" href="/static/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
@@ -12,7 +12,7 @@
         <!-- 侧边栏 -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h2>AI Companion</h2>
+                <h2>World Companion</h2>
                 <button class="btn-new-chat" onclick="newChat()">+ 新对话</button>
             </div>
             <div class="session-list" id="sessionList">
@@ -20,33 +20,56 @@
             </div>
             <div class="sidebar-footer">
                 <a href="/admin" class="btn-admin">后台管理</a>
+                <span class="app-version" id="appVersion"></span>
             </div>
         </aside>
 
-        <!-- 主聊天区 -->
+        <!-- 主聊天区：一张卡片，内部左侧是对话、右侧是记忆/人物/关系 -->
         <main class="main-content">
+            <div class="chat-area">
             <div class="chat-header">
-                <div class="chat-title-area">
-                    <h3 id="chatTitle">新对话</h3>
-                    <button class="btn-rename" onclick="renameSession()" title="重命名">✏️</button>
-                </div>
+                <!-- 原来这里有个会话名标题 + 改名按钮，已删除：
+                     名字在左栏已经有了，这里只是重复一遍，还占一整条视觉空间。
+                     改名挪到左栏每个会话项上（hover 显示）。 -->
                 <div class="chat-actions">
-                    <select id="llmSelect" class="llm-select">
-                        <option value="deepseek">加载中...</option>
-                    </select>
+                    <div class="length-mode" id="lengthModeGroup">
+                        <button class="length-btn active" data-mode="normal" onclick="setLengthMode('normal')" title="标准回复">标准</button>
+                        <button class="length-btn" data-mode="short" onclick="setLengthMode('short')" title="简短回复">短</button>
+                        <button class="length-btn" data-mode="long" onclick="setLengthMode('long')" title="详细回复">详</button>
+                        <span id="lengthModeHint" style="display:none; color: var(--text-secondary); font-size: 12px; margin-left: 5px;"></span>
+                    </div>
+                    <button id="groupModeBtn" class="btn-tts" onclick="toggleGroupMode()" title="群像模式：人物表里的角色可以同场出场说话">🎭</button>
                     <button id="ttsBtn" class="btn-tts active" onclick="toggleTTS()" title="语音播报">🔊</button>
                     <button id="voiceBtn" class="btn-voice" onclick="toggleVoice()" title="语音输入">🎤</button>
-                    <button id="autoBtn" class="btn-auto" onclick="toggleAutoChat()" title="自动语音聊天">🔄</button>
-                    <button onclick="summarizeChat()" title="生成摘要">📝 摘要</button>
-                    <button onclick="clearChat()">清空</button>
-                    <select id="exportFormat" class="llm-select">
-                        <option value="json">JSON</option>
-                        <option value="markdown">Markdown</option>
-                        <option value="txt">TXT</option>
-                    </select>
-                    <button onclick="exportChat()">导出</button>
+                    <div class="more-menu" id="moreMenu">
+                        <button class="btn-more" onclick="toggleMoreMenu(event)" title="更多">⋯</button>
+                        <div class="more-dropdown" id="moreDropdown" style="display: none;">
+                            <div class="more-row">
+                                <label>模型</label>
+                                <select id="llmSelect" class="llm-select">
+                                    <option value="deepseek">加载中...</option>
+                                </select>
+                            </div>
+                            <button id="autoBtn" class="btn-auto" onclick="toggleAutoChat()">🔄 自动语音聊天</button>
+                            <button onclick="openPromptModal()">✏️ 编辑人设</button>
+                            <button onclick="openLoopsModal()">⏳ 管理承诺</button>
+                            <button onclick="openPersonConfigModal()">👨‍👩‍👧 人物配置导入导出</button>
+                            <button onclick="openSearchModal()">🔍 搜索记录</button>
+                            <button onclick="summarizeChat()">📝 生成摘要</button>
+                            <div class="more-row">
+                                <select id="exportFormat" class="llm-select">
+                                    <option value="json">JSON</option>
+                                    <option value="markdown">Markdown</option>
+                                    <option value="txt">TXT</option>
+                                </select>
+                                <button onclick="exportChat()">导出</button>
+                            </div>
+                            <button class="btn-danger-text" onclick="clearChat()">清空对话</button>
+                        </div>
+                    </div>
                 </div>
             </div>
+            <div class="status-bar" id="statusBar"></div>
             <div class="chat-messages" id="chatMessages">
                 <!-- 消息列表 -->
             </div>
@@ -54,51 +77,23 @@
                 <textarea id="messageInput" placeholder="输入消息...（Shift+Enter 换行）" rows="1"></textarea>
                 <button class="btn-send" onclick="sendMessage()">发送</button>
             </div>
+            </div><!-- /chat-area -->
         </main>
 
-        <!-- 右侧面板 -->
+        <!-- 右侧面板：跟左栏一样直接落在最外层底色上，
+             中间那张大卡片浮在两个深色侧栏之间 → 它自然成为视觉主角 -->
         <aside class="right-panel" id="rightPanel">
-            <div class="panel-tabs">
-                <button class="tab-btn active" onclick="switchTab('memory')">记忆</button>
-                <button class="tab-btn" onclick="switchTab('people')">人物</button>
-                <button class="tab-btn" onclick="switchTab('relations')">关系</button>
-                <button class="tab-btn" onclick="switchTab('prompt')">提示词</button>
-                <button class="tab-btn" onclick="switchTab('search')">搜索</button>
-            </div>
-            <div class="panel-content">
-                <div id="memoryPanel" class="tab-panel active"></div>
-                <div id="peoplePanel" class="tab-panel"></div>
-                <div id="relationsPanel" class="tab-panel"></div>
-                <div id="promptPanel" class="tab-panel">
-                    <div class="prompt-section">
-                        <h4>系统提示词</h4>
-                        <p class="prompt-hint">定义 AI 的角色和行为方式，每个对话独立配置</p>
-                        <textarea id="systemPromptInput" class="prompt-textarea" rows="8" placeholder="例如：你是一个温柔体贴的AI伴侣，名叫夏雪..."></textarea>
-                        <button class="btn-save-prompt" onclick="saveSystemPrompt()">保存提示词</button>
-
-                        <div class="template-section">
-                            <h4>提示词模板</h4>
-                            <div class="template-actions">
-                                <select id="templateSelect" class="input-sm" onchange="loadTemplate()">
-                                    <option value="">选择模板...</option>
-                                </select>
-                                <button class="btn btn-primary btn-sm" onclick="useTemplate()">应用</button>
-                                <button class="btn btn-sm" onclick="showAddTemplateModal()">新建</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div id="searchPanel" class="tab-panel">
-                    <div class="search-section">
-                        <div class="search-input-group">
-                            <input type="text" id="searchInput" class="input-sm" placeholder="搜索聊天记录...">
-                            <button class="btn btn-primary btn-sm" onclick="searchChat()">搜索</button>
-                        </div>
-                        <div id="searchResults"></div>
-                    </div>
-                </div>
-            </div>
-        </aside>
+        <div class="panel-tabs">
+            <button class="tab-btn active" onclick="switchTab('memory')">记忆</button>
+            <button class="tab-btn" onclick="switchTab('people')">人物</button>
+            <button class="tab-btn" onclick="switchTab('relations')">关系</button>
+        </div>
+        <div class="panel-content">
+            <div id="memoryPanel" class="tab-panel active"></div>
+            <div id="peoplePanel" class="tab-panel"></div>
+            <div id="relationsPanel" class="tab-panel"></div>
+        </div>
+    </aside>
     </div>
 
     <!-- 新建模板弹窗 -->
@@ -120,6 +115,122 @@
                 <div class="form-actions">
                     <button class="btn" onclick="hideAddTemplateModal()">取消</button>
                     <button class="btn btn-primary" onclick="saveTemplate()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑人设弹窗（作用于当前会话，标题会显示会话名） -->
+    <div class="modal" id="promptModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>编辑人设 · <span id="promptModalSession">当前对话</span></h3>
+                <button class="modal-close" onclick="closePromptModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-section">
+                    <p class="prompt-hint">定义她的角色和行为方式。<b>只对当前这个对话生效</b>，切换对话需要重新设置。</p>
+                    <textarea id="systemPromptInput" class="prompt-textarea" rows="9" placeholder="例如：你是一个温柔体贴的AI伴侣，名叫夏雪..."></textarea>
+                    <button class="btn-save-prompt" onclick="saveSystemPrompt()">保存提示词</button>
+
+                    <div class="template-section">
+                        <h4>提示词模板</h4>
+                        <div class="template-actions">
+                            <select id="templateSelect" class="input-sm" onchange="loadTemplate()">
+                                <option value="">选择模板...</option>
+                            </select>
+                            <button class="btn btn-primary btn-sm" onclick="useTemplate()">应用</button>
+                            <button class="btn btn-sm" onclick="showAddTemplateModal()">新建</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button class="btn" onclick="closePromptModal()">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 搜索聊天记录弹窗 -->
+    <div class="modal" id="searchModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>搜索聊天记录</h3>
+                <button class="modal-close" onclick="closeSearchModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="search-section">
+                    <div class="search-input-group">
+                        <input type="text" id="searchInput" class="input-sm" placeholder="搜索聊天记录...">
+                        <button class="btn btn-primary btn-sm" onclick="searchChat()">搜索</button>
+                    </div>
+                    <div id="searchResults"></div>
+                </div>
+                <div class="form-actions">
+                    <button class="btn" onclick="closeSearchModal()">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 承诺管理弹窗（展示在状态条，这里只做增删改） -->
+    <div class="modal" id="loopsModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>承诺 · <span id="loopsModalSession">当前对话</span></h3>
+                <button class="modal-close" onclick="closeLoopsModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="loopsPanel"></div>
+                <div class="form-actions">
+                    <button class="btn" onclick="closeLoopsModal()">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 人物配置导入导出（人物卡 + 关系 + 称呼 整套搬运） -->
+    <div class="modal" id="personConfigModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>人物配置 · <span id="personConfigSession">当前对话</span></h3>
+                <button class="modal-close" onclick="closePersonConfigModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="prompt-hint">把当前对话的<b>人物卡 + 关系 + 称呼</b>整套装走，新对话一键导入。</p>
+
+                <div class="template-section">
+                    <h4>📥 导入</h4>
+                    <div class="form-group">
+                        <label>从已保存的模板导入</label>
+                        <select id="pcTplSelect" class="input-sm" style="width:100%;"></select>
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn btn-primary btn-sm" onclick="importFamilyTemplate()">导入到当前对话</button>
+                        <button class="btn btn-sm" onclick="deleteFamilyTemplate()">删除此模板</button>
+                    </div>
+                    <div class="form-group" style="margin-top:12px;">
+                        <label>从配置文件导入（选择之前导出的 .json）</label>
+                        <input type="file" id="pcFileInput" accept=".json" class="input-sm" style="width:100%; height:auto; padding:6px;" onchange="importFromFile()">
+                    </div>
+                </div>
+
+                <div class="template-section">
+                    <h4>📤 导出</h4>
+                    <div class="form-group">
+                        <label>导出当前对话的人物卡 + 关系 + 称呼</label>
+                        <input type="text" id="pcExportName" placeholder="导出文件名（如：两家家庭）" class="input-sm" style="width:100%;">
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn btn-primary btn-sm" onclick="exportPersonConfig()">下载配置文件</button>
+                        <button class="btn btn-sm" onclick="savePersonConfigAsTemplate()">同时存为模板</button>
+                    </div>
+                </div>
+
+                <div id="pcStatus" style="font-size:12px; color:var(--text-secondary); margin-top:10px;"></div>
+
+                <div class="form-actions">
+                    <button class="btn" onclick="closePersonConfigModal()">关闭</button>
                 </div>
             </div>
         </div>

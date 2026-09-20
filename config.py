@@ -40,3 +40,15 @@ OLLAMA_MODEL = ENV.get("OLLAMA_MODEL", "qwen2.5:7b-instruct-q4_K_M")
 # TTS 配置
 TTS_PROXY_PORT = int(ENV.get("TTS_PROXY_PORT", 7851))
 TTS_VOICE = ENV.get("TTS_VOICE", "zh-CN-XiaoyiNeural")
+
+
+def get_version():
+    """读 VERSION 文件作为版本号唯一来源，避免多处不同步"""
+    try:
+        with open(os.path.join(BASE_DIR, "VERSION"), "r", encoding="utf-8") as f:
+            return f.read().strip()
+    except Exception:
+        return "unknown"
+
+
+VERSION = get_version()

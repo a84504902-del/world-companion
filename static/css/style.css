@@ -1,16 +1,36 @@
 /* AI Companion - 暗色主题 */
 :root {
-    --bg-primary: #0a0a0a;
-    --bg-secondary: #111111;
-    --bg-card: #1a1a1a;
-    --bg-hover: #252525;
-    --bg-active: #303030;
+    /* 两层结构：底色（最外） + 卡片（主聊天区）
+       左栏/右栏用的是底色，跟四周留白连成一体；
+       中间主区是圆角卡片，看起来"浮"在底色上面。 */
+    /* 明度梯度：每级均匀 +8，整体范围收窄。
+       （原来是 10 → 26 → 33 → 42，第一跳过 16、后面只有 7~9，
+       看起来就是"大卡片浮得太高"，而卡片内部挤在一起） */
+    --bg-primary: #1a1a1a;      /* 左右两栏（灰） */
+    --bg-secondary: #131313;
+    --bg-surface: #0d0d0d;      /* 中间那张大卡片（黑）——实验：对调明暗 */
+
+    --bg-card: #222222;         /* 卡片内部的块：她的气泡、输入框、小卡片 */
+    --bg-hover: #2a2a2a;
+    --bg-active: #323232;       /* 你的气泡 */
+
     --text-primary: #e0e0e0;
     --text-secondary: #888;
     --text-muted: #555;
-    --accent: #333;
-    --accent-hover: #404040;
-    --border: transparent;
+
+    /* ⚠️ 原来 --accent 是 #333（深灰）、--border 是 transparent，
+       导致：消息里的链接几乎读不出来、输入框 focus 没有反馈、
+       弹窗头/分隔线/输入框的边框全都看不见（写了等于没写）。
+       这里给它们真实的值，"层次"和"焦点"就同时有了。 */
+    --accent: #c98a72;                              /* 低饱和暖色，用于链接/焦点/强调 */
+    --accent-soft: rgba(201, 138, 114, 0.15);       /* 淡版，用于选中背景 */
+    --accent-hover: #d99b82;
+    --border: rgba(255, 255, 255, 0.07);            /* 极淡的分隔线（只用在浮层内部） */
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
+    --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.55);
+
     --success: #22c55e;
     --danger: #ef4444;
 }
@@ -32,14 +52,20 @@ body {
 .app-container {
     display: flex;
     height: 100vh;
+    /* 上下留白、左右贴边；配合 gap 让中间的主区成为"浮在底色上的圆角卡片" */
+    padding: 8px 0;
+    gap: 8px;
 }
 
 /* 侧边栏 */
 .sidebar {
     width: 280px;
-    background: var(--bg-secondary);
+    /* 跟最外层底色一致 → 融进底色，中间那张卡片才能"浮"起来 */
+    background: var(--bg-primary);
     display: flex;
     flex-direction: column;
+    /* 不画分隔线：暗色界面里亮色边框会像"切了一刀"（用户反馈"很割裂"）。
+       层次靠背景明度差就够了，那是柔和的。 */
 }
 
 .sidebar-header {
@@ -93,7 +119,9 @@ body {
 }
 
 .session-item.active {
-    background: var(--bg-active);
+    background: var(--accent-soft);
+    /* 左侧一道细色条，比纯背景色更容易一眼定位当前会话 */
+    box-shadow: inset 2px 0 0 var(--accent);
 }
 
 .session-title {
@@ -116,6 +144,26 @@ body {
 
 .session-item:hover .session-delete {
     opacity: 1;
+}
+
+/* 改名按钮：跟删除并排，hover 才出现
+   （原来挂在顶部标题旁边，标题删掉后挪到这里） */
+.session-rename {
+    opacity: 0;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 2px 4px;
+    font-size: 11px;
+}
+
+.session-item:hover .session-rename {
+    opacity: 0.8;
+}
+
+.session-rename:hover {
+    opacity: 1 !important;
 }
 
 .sidebar-footer {
@@ -141,44 +189,39 @@ body {
     background: var(--bg-hover);
 }
 
-/* 主聊天区 */
+/* 主聊天区 —— 就是那张"圆角卡片"。
+   卡片内部左右分栏：左边对话区、右边记忆/人物/关系面板 */
 .main-content {
     flex: 1;
     display: flex;
+    flex-direction: row;
+    /* 顶部缩进 12px：让卡片顶边跟左右两栏内容的起始线对齐
+       （两栏内容 = 容器 8px + 各自顶部留白 12px = 20px 处开始），
+       卡片不再"顶得最满"，三栏视觉上从同一条线开始 */
+    margin-top: 12px;
+    background: var(--bg-surface);
+    border-radius: 14px;
+    /* 让内部的滚动条和内容被圆角裁切，卡片才成立 */
+    overflow: hidden;
+    min-width: 0;
+    /* 极淡的投影，让卡片边缘跟底色过渡得柔一点（暗色里阴影很弱，主要靠色差） */
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+}
+
+/* 卡片内的左半部分：对话 */
+.chat-area {
+    flex: 1;
+    display: flex;
     flex-direction: column;
-    background: var(--bg-primary);
+    min-width: 0;
 }
 
 .chat-header {
     padding: 12px 20px;
     display: flex;
-    justify-content: space-between;
+    /* 原来左边是会话名标题、右边是操作按钮；标题删掉了，操作靠右即可 */
+    justify-content: flex-end;
     align-items: center;
-}
-
-.chat-title-area {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.chat-title-area h3 {
-    font-size: 16px;
-    font-weight: 500;
-}
-
-.btn-rename {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 14px;
-    padding: 4px;
-    opacity: 0.5;
-    transition: opacity 0.2s;
-}
-
-.btn-rename:hover {
-    opacity: 1;
 }
 
 .chat-actions {
@@ -197,6 +240,33 @@ body {
     font-size: 12px;
 }
 
+/* 回复长度三态按钮 */
+.length-mode {
+    display: flex;
+    gap: 2px;
+    background: var(--bg-card);
+    border-radius: 6px;
+    padding: 2px;
+}
+.length-btn {
+    padding: 4px 10px;
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+.length-btn:hover {
+    color: var(--text-primary);
+}
+.length-btn.active {
+    background: #4a9eff;
+    color: #fff;
+    font-weight: 600;
+}
+
 .btn-tts {
     padding: 6px 10px;
     background: var(--bg-card);
@@ -209,6 +279,12 @@ body {
 
 .btn-tts.active {
     background: var(--bg-active);
+}
+
+/* 群像开关：点亮时用 accent 醒目色（原来只有 bg-active，变化太微弱看不出点了没点） */
+#groupModeBtn.active {
+    background: var(--accent);
+    color: #fff;
 }
 
 .btn-voice {
@@ -287,21 +363,77 @@ body {
 .message-content {
     max-width: 70%;
     padding: 12px 16px;
-    border-radius: 14px;
-    line-height: 1.6;
+    border-radius: 16px;
+    /* 中文长对话：行高给足，读起来不挤 */
+    line-height: 1.75;
+    letter-spacing: 0.01em;
     font-size: 14px;
+    box-shadow: var(--shadow-sm);
 }
 
 .message.user .message-content {
     background: var(--bg-active);
     color: var(--text-primary);
-    border-bottom-right-radius: 4px;
+    border-bottom-right-radius: 5px;
 }
 
 .message.assistant .message-content {
     background: var(--bg-card);
     color: var(--text-primary);
-    border-bottom-left-radius: 4px;
+    border-bottom-left-radius: 5px;
+}
+
+/* 她主动发来的留言（你不在的时候留的）—— 比正常对话"轻"一点，
+   像自言自语，而不是在跟你说话 */
+.message.proactive .message-content {
+    background: transparent;
+    border-left: 2px solid var(--bg-active);
+    border-radius: 0 10px 10px 0;
+    padding: 6px 14px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    max-width: 66%;
+}
+.message.proactive .message-time {
+    padding-left: 16px;
+}
+
+.message-time {
+    font-size: 11px;
+    color: var(--text-muted);
+    padding: 4px 8px;
+    text-align: right;
+    /* 默认隐藏，悬停消息时才淡入——逐条时间戳太密，跨天分隔线已承担主要信息 */
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+.message:hover .message-time {
+    opacity: 1;
+}
+
+/* 「正在输入」指示（等首个 token 期间显示） */
+.typing-indicator {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+    padding: 3px 0;
+}
+.typing-indicator i {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--text-muted);
+    animation: typingBounce 1.2s infinite;
+}
+.typing-indicator i:nth-child(2) { animation-delay: 0.15s; }
+.typing-indicator i:nth-child(3) { animation-delay: 0.3s; }
+@keyframes typingBounce {
+    0%, 60%, 100% { opacity: 0.25; transform: translateY(0); }
+    30%           { opacity: 1;    transform: translateY(-3px); }
+}
+
+.message.user .message-time {
+    text-align: left;
 }
 
 /* Markdown 样式 */
@@ -404,6 +536,7 @@ body {
     padding: 12px 20px;
     display: flex;
     gap: 12px;
+    /* 同样不画线（见上）：输入框自己有背景色，靠留白+色差已经分得开了 */
 }
 
 .chat-input textarea {
@@ -421,56 +554,77 @@ body {
 .chat-input textarea:focus {
     outline: none;
     background: var(--bg-hover);
+    /* 用 box-shadow 画描边，不影响布局尺寸 */
+    box-shadow: 0 0 0 1px rgba(201, 138, 114, 0.45);
 }
 
 .btn-send {
     padding: 10px 24px;
-    background: var(--bg-hover);
-    color: var(--text-primary);
+    background: var(--accent-soft);
+    color: var(--accent);
     border: none;
     border-radius: 10px;
     cursor: pointer;
     font-size: 13px;
     font-weight: 500;
-    transition: all 0.2s;
+    transition: background 0.2s, color 0.2s, transform 0.1s;
 }
 
 .btn-send:hover {
-    background: var(--bg-active);
+    background: var(--accent);
+    color: #1a1412;
 }
 
-/* 右侧面板 */
+.btn-send:active {
+    transform: scale(0.97);
+}
+
+/* 右侧面板 —— 一张**浮在大卡片上面的小卡片**。
+   不用分隔线：四周留 8px 缝，露出下面的大卡片（灰色底），
+   再加上比大卡片亮一档的底色和圆角 ——
+   边界靠"缝 + 明度 + 形状"就出来了，不需要画任何线。 */
+/* 右侧面板 —— 跟左栏同一套语言：直接落在最外层底色上，
+   不做卡片、不留缝。中间的大卡片浮在左右两个深色栏之间，
+   明度差自然把主角让给中间，右栏只是"安静的边栏"。 */
 .right-panel {
-    width: 320px;
-    background: var(--bg-secondary);
+    width: 292px;
+    flex-shrink: 0;
     display: flex;
     flex-direction: column;
+    background: var(--bg-primary);
+    padding: 4px 0 8px;   /* 内部元素自带 padding，这里只补上下 */
+    overflow: hidden;
 }
 
 .panel-tabs {
     display: flex;
-    padding: 0 8px;
+    padding: 8px;
+    gap: 4px;
 }
 
+/* 胶囊式 tab：选中的用一块圆角背景表示，不用下划线。
+   原来用 border-bottom 画白线（#e0e0e0），是界面上最亮的一条线，
+   在卡片式的布局里特别突兀——而且"线"跟这里的"块"语言不统一。 */
 .tab-btn {
     flex: 1;
-    padding: 14px 8px;
+    padding: 7px 6px;
     background: none;
     border: none;
-    border-bottom: 2px solid transparent;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 12px;
     color: var(--text-secondary);
-    transition: all 0.2s;
+    transition: background 0.15s, color 0.15s;
 }
 
 .tab-btn:hover {
     color: var(--text-primary);
+    background: var(--bg-hover);
 }
 
 .tab-btn.active {
     color: var(--text-primary);
-    border-bottom-color: var(--text-primary);
+    background: var(--bg-card);
 }
 
 .panel-content {
@@ -488,17 +642,47 @@ body {
 }
 
 /* 记忆面板 */
+.memory-hint {
+    padding: 8px 12px;
+    /* 原来是蓝色（rgba(74,158,255)），跟界面统一的暖色 accent 打架，改成同色系 */
+    background: var(--accent-soft);
+    border: 1px solid rgba(201, 138, 114, 0.22);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+.memory-hint b {
+    /* 跟 accent 同色系（原来是蓝色 #4a9eff，跟暖色调打架） */
+    color: var(--accent);
+}
+
 .memory-item {
-    padding: 12px;
+    /* 紧凑单行，与人物/关系列表统一 */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
     background: var(--bg-card);
     border-radius: 10px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
+}
+.memory-item:hover {
+    background: var(--bg-hover);
 }
 
 .memory-content {
-    font-size: 14px;
-    margin-bottom: 8px;
+    flex: 1;
+    min-width: 0;
+    font-size: 12px;
     line-height: 1.5;
+    margin-bottom: 0;
+    /* 最多两行，超出省略号 */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .memory-meta {
@@ -511,32 +695,103 @@ body {
 
 /* 人物面板 */
 .person-item {
-    padding: 12px;
+    /* 紧凑单行：名字+描述左侧，删除按钮右侧（原来三行一人，8个人物要滚半天） */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
     background: var(--bg-card);
     border-radius: 10px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
+}
+.person-item:hover {
+    background: var(--bg-hover);
+}
+
+/* 人物名字前的小圆点：accent 色标识，扫一眼就能数出几个人 */
+.person-name::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin-right: 6px;
+    vertical-align: 2px;
+}
+
+.person-info {
+    flex: 1;
+    min-width: 0;          /* 让描述能省略号截断而不是把行撑高 */
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    flex-wrap: wrap;
 }
 
 .person-name {
     font-weight: 500;
-    margin-bottom: 4px;
+    font-size: 12px;
 }
 
 .person-desc {
-    font-size: 13px;
+    font-size: 11px;
     color: var(--text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 160px;
+}
+
+/* 小号删除按钮：× 样式， hover 才浮现红色，平时不抢视觉 */
+.person-del {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 6px;
+}
+.person-del:hover {
+    color: #f87171;
+    background: rgba(248, 113, 113, 0.1);
+}
+
+/* 人物卡编辑表单（点击人物行展开） */
+.person-edit {
+    background: var(--bg-secondary);
+    border-radius: 10px;
+    padding: 10px;
+    margin: -2px 0 8px;
+}
+.person-edit .add-section {
     margin-bottom: 8px;
+}
+textarea.input-sm {
+    height: auto;
+    line-height: 1.5;
+    resize: vertical;
 }
 
 /* 关系面板 */
 .relation-item {
-    padding: 12px;
+    padding: 7px 12px;
     background: var(--bg-card);
     border-radius: 10px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    font-size: 12px;
+}
+/* 箭头弱化成背景色级的灰，让名字和徽章跳出来 */
+.rel-arrow {
+    color: var(--text-muted);
+    font-size: 11px;
+    margin: 0 2px;
 }
 
 /* 提示词面板 */
@@ -684,19 +939,33 @@ body {
 }
 
 .input-sm {
-    padding: 8px 12px;
+    /* 紧凑控件：统一 32px 高，有边界感（原来是 8px 内边距的"大黑块"） */
+    box-sizing: border-box;
+    height: 32px;
+    padding: 0 10px;
     background: var(--bg-card);
     color: var(--text-primary);
-    border: none;
+    border: 1px solid var(--border);
     border-radius: 8px;
-    font-size: 13px;
+    font-size: 12px;
     flex: 1;
-    min-width: 80px;
+    min-width: 0;
+}
+
+.input-sm::placeholder {
+    color: var(--text-muted);
 }
 
 .input-sm:focus {
     outline: none;
     background: var(--bg-hover);
+    border-color: rgba(201, 138, 114, 0.35);
+}
+
+/* 下拉列表本身也用暗色（白底下拉在暗色界面里非常刺眼） */
+select.input-sm option {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
 }
 
 /* 模板区域 */
@@ -737,6 +1006,8 @@ body {
     width: 480px;
     max-height: 80vh;
     overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
 }
 
 .modal-header {
@@ -835,7 +1106,8 @@ body {
 
 /* 滚动条 */
 ::-webkit-scrollbar {
-    width: 6px;
+    width: 10px;
+    height: 10px;
 }
 
 ::-webkit-scrollbar-track {
@@ -843,12 +1115,20 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--bg-hover);
-    border-radius: 3px;
+    /* 用 border + padding-box 让滑块视觉上比轨道细，比直接缩小 width 精致 */
+    background: rgba(255, 255, 255, 0.10);
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    border-radius: 8px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--bg-active);
+    background: rgba(255, 255, 255, 0.20);
+    background-clip: padding-box;
+}
+
+::-webkit-scrollbar-corner {
+    background: transparent;
 }
 
 /* 流式输出光标 */
@@ -863,12 +1143,24 @@ body {
 }
 
 .memory-tag {
-    background: #2a2a3a;
-    color: #aaa;
-    padding: 2px 6px;
-    border-radius: 3px;
-    font-size: 12px;
-    margin: 0 4px;
+    /* 显眼色：accent 同色系小徽章（原来是灰蓝 #2a2a3a，毫无存在感） */
+    flex-shrink: 0;
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+}
+
+/* 关系词：accent 徽章（和记忆 tag 同款），显眼且成体系 */
+.relation-type {
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 1px 7px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 600;
+    margin: 0 1px;
 }
 
 /* 停止生成按钮（发送按钮在流式输出时变为停止按钮） */
@@ -883,4 +1175,177 @@ body {
 @keyframes pulse-stop {
     0%, 100% { box-shadow: 0 0 0 0 rgba(192, 57, 43, 0.4); }
     50% { box-shadow: 0 0 0 6px rgba(192, 57, 43, 0); }
+}
+
+/* ==================== 未完结事件（她在等的事） ==================== */
+.loop-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-top: 10px;
+}
+.loop-content {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--text-primary);
+    margin-bottom: 5px;
+}
+.loop-meta {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+.loop-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.loop-tag {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    background: rgba(0, 0, 0, 0.3);
+    color: #999;
+    margin-right: 4px;
+}
+.loop-tag.overdue {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+}
+.loop-tag.closed {
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+}
+.loop-toggle {
+    margin-top: 14px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+.loop-toggle label {
+    cursor: pointer;
+}
+
+/* ==================== 顶部状态条 ==================== */
+.status-bar {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-wrap: wrap;
+    padding: 6px 16px;
+    /* 去掉原先的 border-bottom（#2a2a2a）：
+       主界面统一不画分隔线，层次靠背景色差，否则界面会显得被切成几块 */
+    background: rgba(34, 197, 94, 0.07);
+    font-size: 11px;
+    color: var(--text-secondary);
+    min-height: 25px;
+}
+.status-bar .sb-dot {
+    color: var(--text-muted);
+}
+.status-bar .sb-pending {
+    color: #f87171;
+    animation: sbFade 0.55s ease;
+}
+@keyframes sbFade {
+    from { opacity: 0; transform: translateY(5px); }
+    to   { opacity: 1; transform: none; }
+}
+.status-bar .sb-story {
+    color: #4ade80;
+}
+
+/* ==================== 消息流时间分隔 ==================== */
+.time-divider {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 12px 0 10px;
+}
+.time-divider::before,
+.time-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+}
+.time-divider span {
+    font-size: 11px;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+.time-divider.gap span {
+    color: #f87171;
+}
+
+/* ==================== 更多菜单（收起调试类控件） ==================== */
+.more-menu {
+    position: relative;
+}
+.btn-more {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-secondary);
+    padding: 4px 11px;
+    font-size: 13px;
+    line-height: 1.4;
+    cursor: pointer;
+}
+.btn-more:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+.more-dropdown {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 5px);
+    display: none;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 205px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px;
+    z-index: 200;
+}
+.more-dropdown button {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-secondary);
+    padding: 6px 9px;
+    font-size: 12px;
+    text-align: left;
+    cursor: pointer;
+}
+.more-dropdown button:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+.more-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+.more-row label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+.btn-danger-text {
+    color: #f87171 !important;
+}
+
+/* 左栏底部的版本号 */
+.app-version {
+    display: block;
+    margin-top: 7px;
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+    letter-spacing: 0.3px;
 }

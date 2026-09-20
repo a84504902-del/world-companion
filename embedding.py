@@ -1,20 +1,30 @@
 """本地向量嵌入模块 — 使用 sentence-transformers"""
 import json
 import math
+import os
 import threading
 import logging
+import sys
+
+# 确保项目根目录在路径中
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 logger = logging.getLogger("embedding")
+
+# 禁用 HuggingFace 下载进度条和长重试，避免卡死
+os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
+os.environ.setdefault("TRANSFORMERS_OFFLINE", "0")
 
 _model = None
 _model_lock = threading.Lock()
 _model_loading = False
 _model_ready = False
+_load_error = None
 
 
 def load_model():
     """懒加载 sentence-transformers 模型（线程安全）"""
-    global _model, _model_loading, _model_ready
+    global _model, _model_loading, _model_ready, _load_error
     if _model_ready:
         return _model
     with _model_lock:
@@ -22,15 +32,24 @@ def load_model():
             return _model
         if _model_loading:
             return None
+        if _load_error:
+            logger.warning("嵌入模型加载失败: %s，跳过向量化", _load_error)
+            return None
         _model_loading = True
         try:
             from sentence_transformers import SentenceTransformer
-            logger.info("加载嵌入模型 all-MiniLM-L6-v2 ...")
-            _model = SentenceTransformer("all-MiniLM-L6-v2")
+            model_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models", "embedding")
+            if os.path.exists(model_path):
+                logger.info("从本地加载嵌入模型 ...")
+                _model = SentenceTransformer(model_path, trust_remote_code=True)
+            else:
+                logger.info("加载嵌入模型 all-MiniLM-L6-v2 ...")
+                _model = SentenceTransformer("all-MiniLM-L6-v2", trust_remote_code=True)
             _model_ready = True
             logger.info("模型加载完成")
         except Exception as e:
-            logger.error("模型加载失败: %s", e)
+            _load_error = str(e)
+            logger.error("模型加载失败（将跳过向量化功能）: %s", e)
             _model = None
         finally:
             _model_loading = False

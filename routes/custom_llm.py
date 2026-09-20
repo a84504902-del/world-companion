@@ -173,6 +173,18 @@ async def test_llm(request):
         return web.json_response({"error": f"连接失败: {e}"}, status=400)
 
 
+def _validate_api_key(api_key):
+    """检查 API Key 是否只含 ASCII，避免 urllib 报 latin-1 编码错误"""
+    if not api_key:
+        return "API Key 为空"
+    try:
+        api_key.encode("latin-1")
+    except UnicodeEncodeError as e:
+        bad = e.object[e.start:e.end]
+        return f"API Key 包含非法字符 {bad!r}（U+{ord(bad):04X}），请重新配置"
+    return None
+
+
 def get_llm_chat_func(llm_id):
     """获取 LLM 调用函数"""
     data = load_llm_config()
@@ -182,9 +194,15 @@ def get_llm_chat_func(llm_id):
             base_url = m.get("base_url", "")
             model = m.get("model", "")
 
+            err = _validate_api_key(api_key)
+            if err:
+                def _error_fn(*args, **kwargs):
+                    return f"LLM 配置错误: {err}"
+                return _error_fn
+
             # Ollama 特殊处理
             if "localhost:11434" in base_url or "127.0.0.1:11434" in base_url:
-                def ollama_chat(messages, base_url=base_url, model=model):
+                def ollama_chat(messages, base_url=base_url, model=model, max_tokens=None):
                     msg_data = json.dumps({
                         "model": model,
                         "messages": messages,
@@ -198,7 +216,7 @@ def get_llm_chat_func(llm_id):
 
             # 百度文心特殊处理
             if "baidubce.com" in base_url:
-                def baidu_chat(messages, api_key=api_key, model=model):
+                def baidu_chat(messages, api_key=api_key, model=model, max_tokens=None):
                     # 获取 access_token
                     parts = api_key.split("|")
                     if len(parts) == 2:
@@ -224,13 +242,18 @@ def get_llm_chat_func(llm_id):
                 return baidu_chat
 
             # 通用 OpenAI 兼容格式
-            def openai_chat(messages, base_url=base_url, api_key=api_key, model=model):
-                msg_data = json.dumps({
+            def openai_chat(messages, base_url=base_url, api_key=api_key, model=model, max_tokens=2000, temperature=0.8):
+                body = {
                     "model": model,
                     "messages": messages,
-                    "max_tokens": 500,
-                    "temperature": 0.8
-                }).encode("utf-8")
+                    "max_tokens": max_tokens,
+                    "temperature": temperature
+                }
+                # DeepSeek V4 默认思考模式：reasoning 会占满 max_tokens 导致 content 为空（空回复/卡住）
+                # 这里显式关闭思考模式，确保每次都有正常回复
+                if "deepseek" in model.lower():
+                    body["thinking"] = {"type": "disabled"}
+                msg_data = json.dumps(body).encode("utf-8")
 
                 req = urllib.request.Request(
                     base_url,
@@ -257,13 +280,20 @@ def get_llm_stream_func(llm_id):
             base_url = m.get("base_url", "")
             model = m.get("model", "")
 
+            err = _validate_api_key(api_key)
+            if err:
+                def _error_stream(*args, **kwargs):
+                    yield f"LLM 配置错误: {err}"
+                    return
+                return _error_stream
+
             # 百度不支持流式
             if "baidubce.com" in base_url:
                 return None
 
             # Ollama 流式
             if "localhost:11434" in base_url or "127.0.0.1:11434" in base_url:
-                def ollama_stream(messages, base_url=base_url, model=model):
+                def ollama_stream(messages, base_url=base_url, model=model, max_tokens=None):
                     """流式调用 Ollama，yield 文本片段"""
                     msg_data = json.dumps({
                         "model": model,
@@ -288,15 +318,20 @@ def get_llm_stream_func(llm_id):
                 return ollama_stream
 
             # OpenAI 兼容流式
-            def openai_stream(messages, base_url=base_url, api_key=api_key, model=model):
+            def openai_stream(messages, base_url=base_url, api_key=api_key, model=model, max_tokens=2000, temperature=0.8):
                 """流式调用 OpenAI 兼容接口，yield 文本片段"""
-                msg_data = json.dumps({
+                body = {
                     "model": model,
                     "messages": messages,
-                    "max_tokens": 500,
-                    "temperature": 0.8,
+                    "max_tokens": max_tokens,
+                    "temperature": temperature,
                     "stream": True
-                }).encode("utf-8")
+                }
+                # DeepSeek V4 默认思考模式：reasoning 会占满 max_tokens 导致 content 为空（空回复/卡住）
+                # 这里显式关闭思考模式，确保每次都有正常回复
+                if "deepseek" in model.lower():
+                    body["thinking"] = {"type": "disabled"}
+                msg_data = json.dumps(body).encode("utf-8")
                 req = urllib.request.Request(
                     base_url, data=msg_data,
                     headers={"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"}

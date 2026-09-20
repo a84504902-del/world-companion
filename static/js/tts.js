@@ -24,6 +24,7 @@ export function toggleTTS() {
     const btn = document.getElementById('ttsBtn');
     btn.classList.toggle('active', state.ttsEnabled);
     btn.textContent = state.ttsEnabled ? '🔊' : '🔇';
+    btn.title = state.ttsEnabled ? '语音播报已开启' : '语音播报已关闭（点击开启）';
 }
 
 // 初始化：获取麦克风权限，创建 MediaRecorder

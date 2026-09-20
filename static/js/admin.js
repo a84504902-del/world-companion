@@ -137,7 +137,7 @@ async function loadSessions() {
         document.getElementById('sessionsTable').innerHTML = data.sessions.map(s => `
             <tr>
                 <td><code>${s.id.substring(0, 16)}...</code></td>
-                <td>${escapeHtml(s.title || '新对话')}</td>
+                <td>${escapeHtml(s.title || '未命名对话')}</td>
                 <td>${s.msg_count}</td>
                 <td>${s.created || '-'}</td>
                 <td>

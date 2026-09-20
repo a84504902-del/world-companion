@@ -77,3 +77,27 @@ async def update_weight(request):
 
     db.update_memory_weight(memory_id, weight)
     return web.json_response({"ok": True})
+
+
+# ============ 钦点记忆（"记住：X"写入的常驻层） ============
+async def list_pins(request):
+    """获取当前会话生效中的钦点记忆"""
+    session_id = request.query.get("session_id", "")
+    if not session_id:
+        return web.json_response({"pins": []})
+    return web.json_response({"pins": db.list_active_pins(session_id)})
+
+
+async def delete_pin(request):
+    """删除钦点记忆（用户手动，唯一淘汰方式）"""
+    try:
+        data = await request.json()
+    except Exception:
+        return web.json_response({"error": "无效的JSON"}, status=400)
+
+    pin_id = data.get("id")
+    if not pin_id:
+        return web.json_response({"error": "缺少 id"}, status=400)
+
+    db.delete_pinned(pin_id)
+    return web.json_response({"ok": True})

@@ -15,7 +15,7 @@ async def synthesize(text):
         raise RuntimeError("edge-tts 未安装，请运行: pip install edge-tts")
 
     # 生成唯一的文件名
-    text_hash = hashlib.md5(text.encode()).hexdigest()[:12]
+    text_hash = hashlib.md5(text.encode('utf-8', errors='ignore')).hexdigest()[:12]
     output_file = os.path.join(tempfile.gettempdir(), f"tts_{text_hash}.mp3")
 
     # 如果已存在，直接返回

@@ -13,7 +13,7 @@ import db
 import embedding
 import memory_retriever
 from log import setup_logging
-from routes import chat, memory, person, relation, admin, custom_llm, template, stt
+from routes import chat, memory, person, relation, admin, custom_llm, template, stt, openloop, family_template
 
 setup_logging()
 logger = logging.getLogger("app")
@@ -48,26 +48,45 @@ async def audio_handler(request):
         return web.Response(status=404, text="音频不存在")
 
 
+KEEP_BACKUPS = 5  # 数据库自动备份保留份数
+
+
 def backup_database():
-    """备份数据库文件"""
+    """备份数据库文件（保留最近 KEEP_BACKUPS 份）"""
     if not os.path.exists(config.DB_PATH):
         return
     backup_dir = os.path.join(config.BASE_DIR, "backups")
     os.makedirs(backup_dir, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     backup_path = os.path.join(backup_dir, f"memory_{timestamp}.db")
+
+    # 同一秒内重复备份会撞名，加后缀
+    if os.path.exists(backup_path):
+        backup_path = os.path.join(backup_dir, f"memory_{timestamp}_2.db")
+
     try:
-        shutil.copy2(config.DB_PATH, backup_path)
-        # 只保留最近 7 个备份
-        backups = sorted(
-            [f for f in os.listdir(backup_dir) if f.startswith("memory_") and f.endswith(".db")]
-        )
-        while len(backups) > 7:
-            old = backups.pop(0)
-            os.remove(os.path.join(backup_dir, old))
-        logger.info("数据库已备份: %s", backup_path)
+        # 用 VACUUM INTO 做一致性备份：
+        # 直接 shutil.copy2 会漏掉 wal 里还没落盘的数据
+        db.connect().execute("VACUUM INTO ?", (backup_path.replace("\\", "/"),))
     except Exception as e:
         logger.error("数据库备份失败: %s", e)
+        return
+
+    # 清理旧备份
+    try:
+        backups = sorted(
+            [f for f in os.listdir(backup_dir)
+             if f.startswith("memory_") and f.endswith(".db")]
+        )
+        while len(backups) > KEEP_BACKUPS:
+            old = backups.pop(0)
+            try:
+                os.remove(os.path.join(backup_dir, old))
+            except Exception as e:
+                logger.warning("删除旧备份失败（不影响使用）: %s - %s", old, e)
+        logger.info("数据库已备份: %s（保留最近 %d 份）", backup_path, KEEP_BACKUPS)
+    except Exception as e:
+        logger.error("清理旧备份失败: %s", e)
 
 
 async def backup_handler(request):
@@ -81,7 +100,16 @@ async def backup_handler(request):
 
 def create_app():
     """创建应用"""
-    app = web.Application(client_max_size=10 * 1024 * 1024)
+
+    # 前端文件禁缓存：改了 JS/CSS 用户刷新就能看到，不用强刷（踩过"改了没反应"的坑）
+    @web.middleware
+    async def no_cache_frontend(request, handler):
+        resp = await handler(request)
+        if request.path.startswith("/static") or request.path == "/" or request.path == "/index.html":
+            resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        return resp
+
+    app = web.Application(client_max_size=10 * 1024 * 1024, middlewares=[no_cache_frontend])
 
     async def on_cleanup(app):
         db.close_conn()
@@ -99,6 +127,8 @@ def create_app():
 
     # 聊天
     app.router.add_post("/chat", chat.chat_handler)
+    app.router.add_post("/api/catchup", chat.catchup_handler)
+    app.router.add_post("/api/session_model", chat.set_model_handler)
     app.router.add_get("/history", chat.history_handler)
     app.router.add_get("/chat_sessions", chat.sessions_handler)
     app.router.add_post("/new_chat", chat.new_chat_handler)
@@ -113,6 +143,9 @@ def create_app():
     app.router.add_get("/api/search_chat", chat.search_chat_handler)
     app.router.add_post("/api/rename_session", chat.rename_session_handler)
     app.router.add_post("/api/cancel_chat", chat.cancel_chat_handler)
+    app.router.add_get("/api/proposals", chat.get_proposals_handler)
+    app.router.add_post("/api/proposals/accept", chat.accept_proposal_handler)
+    app.router.add_post("/api/proposals/reject", chat.reject_proposal_handler)
 
     # 记忆
     app.router.add_get("/memories", memory.list_memories)
@@ -120,6 +153,16 @@ def create_app():
     app.router.add_post("/delete_memory", memory.delete_memory)
     app.router.add_post("/api/save_memory_from_message", memory.save_from_message)
     app.router.add_post("/api/memory/update_weight", memory.update_weight)
+    app.router.add_get("/api/pins/list", memory.list_pins)
+    app.router.add_post("/api/pins/delete", memory.delete_pin)
+
+    # 人物/关系模板（独立配置模块）
+    app.router.add_get("/api/family_template/list", family_template.list_family_templates)
+    app.router.add_post("/api/family_template/save", family_template.save_family_template)
+    app.router.add_post("/api/family_template/import", family_template.import_family_template)
+    app.router.add_post("/api/family_template/delete", family_template.delete_family_template)
+    app.router.add_get("/api/family_template/export", family_template.export_current)
+    app.router.add_post("/api/family_template/import_data", family_template.import_uploaded)
 
     # 人物
     app.router.add_get("/api/people/list", person.list_people)
@@ -139,6 +182,14 @@ def create_app():
     app.router.add_get("/api/sessions", admin.sessions_handler)
     app.router.add_get("/api/database/info", admin.database_info_handler)
     app.router.add_post("/api/database/vacuum", admin.database_vacuum_handler)
+
+    # 未完结事件（她在等的事 —— 核心引擎）
+    app.router.add_get("/api/status", openloop.status)
+    app.router.add_get("/api/loops/list", openloop.list_loops)
+    app.router.add_post("/api/loops/add", openloop.add_loop)
+    app.router.add_post("/api/loops/update", openloop.update_loop)
+    app.router.add_post("/api/loops/close", openloop.close_loop)
+    app.router.add_post("/api/loops/delete", openloop.delete_loop)
 
     # 自定义 LLM
     app.router.add_get("/api/llms", custom_llm.list_llms)
@@ -166,13 +217,20 @@ def create_app():
 
 
 def _init_embedding_background():
-    """后台初始化嵌入模型和预加载向量缓存"""
+    """后台初始化嵌入模型、预加载向量缓存、索引存量对话原文"""
     try:
         memory_retriever.preload_cache()
         if not embedding.is_ready():
             embedding.load_model()
             # 预加载后重新构建缓存（如果有新记忆需要向量化）
             memory_retriever.preload_cache()
+        # 增量索引所有会话的存量对话原文（幂等，可重复执行）
+        sessions = db.get_all_sessions()
+        for s in sessions:
+            try:
+                memory_retriever.index_conversation_chunks(s["id"])
+            except Exception as e:
+                logger.error("索引会话 %s 对话原文失败: %s", s["id"], e)
     except Exception as e:
         logger.error("嵌入初始化失败: %s", e)
 
