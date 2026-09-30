@@ -3,6 +3,7 @@ import logging
 from datetime import datetime
 
 from routes.custom_llm import get_llm_chat_func, get_llm_stream_func
+from prompts import fallback_system_prompt, get_length_mode
 
 logger = logging.getLogger("llm")
 
@@ -50,8 +51,8 @@ def _build_messages(text, history, system_prompt, memory_text, length_mode, grou
     from config import ENV
 
     if not system_prompt:
-        system_prompt = ENV.get("SYSTEM_PROMPT",
-            "你是一个温柔体贴的AI伴侣，名叫夏雪。你会用温暖、关心的语气回复用户，像一个贴心的朋友或恋人。回复要自然、有感情，不要太长，像日常聊天一样。")
+        # SYSTEM_PROMPT 环境变量可覆盖；否则由 persona_anchor.json 生成回退（单一人设来源，杜绝第二份人设定义）
+        system_prompt = ENV.get("SYSTEM_PROMPT") or fallback_system_prompt()
 
     # 清洗历史记录：移除包含括号或第三人称的漂移消息
     if history:
@@ -66,29 +67,10 @@ def _build_messages(text, history, system_prompt, memory_text, length_mode, grou
     else:
         history = []
 
-    # 根据长度模式添加不同的指令
-    if length_mode == "short":
-        system_prompt = """[长度要求] 你的回复必须非常简短，不超过40字，1-2句话即可。
-就像微信聊天一样，直接说重点，不要任何铺垫、动作描写或情绪渲染。
-
-示例：
-用户：你好
-你：嗨~今天怎么样？
-
-用户：吃了吗
-你：刚吃完，你呢？
-
-用户：我想你
-你：我也是呀~""" + "\n\n" + system_prompt
-    elif length_mode == "long":
-        system_prompt = """[长度要求] 你的回复必须非常详细，200-400字。要有完整的场景、动作、表情、心理活动描写，像写小说一样生动丰富。
-但注意：所有动作和心理通过对话自然表达，不使用任何括号格式。
-
-示例：
-用户：你好
-你：我放下手中的书，抬起头看着你，眼睛里带着温柔的笑意：哎呀，又见面啦~你今天看起来心情不错的样子呢。我走到你身边，轻轻挽住你的手臂，声音像春天的微风：我刚泡了杯花茶，要不要一起坐会儿？窗外的阳光正好，透过玻璃洒进来，暖洋洋的。我侧过头，认真地看着你：对了，你昨天说的那个事情，后来怎么样了？我一直记挂着呢，感觉你好像有点心事的样子。
-
-请严格按照以上格式回复。""" + "\n\n" + system_prompt
+    # 长度模式指令从 prompts.json 读取（normal / 未知返回空串，不额外约束）
+    _lm = get_length_mode(length_mode)
+    if _lm:
+        system_prompt = _lm + "\n\n" + system_prompt
 
     # 群像模式：允许多人物同场（放在长度指令之后、人设主体之前，高注意力区）
     if group_mode:

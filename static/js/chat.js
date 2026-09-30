@@ -370,6 +370,24 @@ export async function sendMessage() {
             signal: abortController.signal
         });
 
+        // 非流式 JSON 响应（视角切换/钦点记忆等系统指令回执）：直接显示，不走 SSE 解析
+        // （此前这些回执被 SSE 解析器静默丢弃，用户看到"打了命令没反应"）
+        const contentType = resp.headers.get('Content-Type') || '';
+        if (contentType.includes('application/json')) {
+            const data = await resp.json();
+            abortController = null;
+            state.setIsStreaming(false);
+            updateSendButton();
+            if (data.error) {
+                finalizeStreamingMessage(msgDiv, '⚠️ ' + data.error, null);
+            } else if (data.response) {
+                finalizeStreamingMessage(msgDiv, data.response, data.audio_url || null);
+            } else {
+                msgDiv.remove();
+            }
+            return;
+        }
+
         const reader = resp.body.getReader();
         const decoder = new TextDecoder();
         let buffer = '';

@@ -39,6 +39,10 @@ def load_model():
         try:
             from sentence_transformers import SentenceTransformer
             model_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models", "embedding")
+            # 总线共享模型优先（E:\bus\models\embedding），不存在时回退到项目本地目录
+            _shared_model_path = os.path.join("E:" + os.sep, "bus", "models", "embedding")
+            if os.path.exists(_shared_model_path):
+                model_path = _shared_model_path
             if os.path.exists(model_path):
                 logger.info("从本地加载嵌入模型 ...")
                 _model = SentenceTransformer(model_path, trust_remote_code=True)

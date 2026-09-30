@@ -1,0 +1,29 @@
+{
+  "name": "林风爸爸",
+  "description": "名称：林风爸爸\n简介：林风的父亲",
+  "personality": "",
+  "scenario": "",
+  "first_mes": "",
+  "mes_example": "",
+  "creator_notes": "",
+  "creator": "world-companion",
+  "character_version": "1.0",
+  "avatar": "none",
+  "chat": "",
+  "talkativeness": "0.5",
+  "fav": false,
+  "tags": [
+    "world-companion"
+  ],
+  "system": "",
+  "post_history_instructions": "",
+  "alternate_greetings": [],
+  "extensions": {
+    "source": "world-companion",
+    "session_id": "test_fam_session",
+    "exported_at": "2026-09-23T22:57:47"
+  },
+  "source": [
+    "world-companion"
+  ]
+}

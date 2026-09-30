@@ -4,6 +4,9 @@ llm_config.json
 custom_llms.json
 prompt_templates.json
 
+# 本地人设覆盖层（含私人内容，绝不入库；公开版见 persona_anchor.json）
+persona_local.json
+
 # 数据库
 memory.db
 backups/

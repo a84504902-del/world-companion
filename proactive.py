@@ -51,6 +51,9 @@ def _persona_brief():
     try:
         import config
         path = os.path.join(config.BASE_DIR, "persona_anchor.json")
+        local_path = os.path.join(config.BASE_DIR, "persona_local.json")
+        if os.path.exists(local_path):
+            path = local_path
         with open(path, "r", encoding="utf-8") as f:
             d = json.load(f)
         bits = []
