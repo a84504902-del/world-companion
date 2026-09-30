@@ -7,8 +7,10 @@ prompt_templates.json
 # 本地人设覆盖层（含私人内容，绝不入库；公开版见 persona_anchor.json）
 persona_local.json
 
-# 数据库
+# 数据库（含 SQLite 运行时产生的临时文件，可能含私人对话，绝不入库）
 memory.db
+memory.db-shm
+memory.db-wal
 backups/
 
 # Python
