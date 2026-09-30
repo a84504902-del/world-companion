@@ -15,6 +15,7 @@ backups/
 __pycache__/
 *.pyc
 venv/
+.venv/
 
 # 音频缓存
 *.mp3
