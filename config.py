@@ -24,8 +24,14 @@ def load_env():
 ENV = load_env()
 
 # 服务器配置
-HOST = ENV.get("HOST", "0.0.0.0")
+# HOST 默认只绑本机：服务无鉴权，绑 0.0.0.0 时同一 Wi-Fi 下任何人都能访问/偷 Key。
+# 确实需要手机等局域网设备访问时，在 .env 显式写 HOST=0.0.0.0（并建议同时配 ACCESS_TOKEN）
+HOST = ENV.get("HOST", "127.0.0.1")
 PORT = int(ENV.get("PORT", 8765))
+
+# 访问令牌（可选）：配了非空值后，所有请求必须带 ?token=xxx 或 X-Access-Token: xxx 头。
+# 不配 = 不启用鉴权（默认）。配了之后浏览器打开 http://127.0.0.1:8877/?token=xxx 用。
+ACCESS_TOKEN = ENV.get("ACCESS_TOKEN", "")
 
 # LLM 配置
 DEEPSEEK_API_KEY = ENV.get("DEEPSEEK_API_KEY", "")

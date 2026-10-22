@@ -201,4 +201,35 @@ def describe(session_id):
     else:
         lines.append("你们正聊着，没分开过")
 
+    # 时间锚定：用户的话和剧情时间打架时，点破而不是将错就错
+    lines.append(
+        "以上「剧情」时间是场景里的真实时间。若用户的话和它打架"
+        "（比如大早上说晚安、半夜说吃早饭），以角色身份自然点破并把时间锚回来"
+        "（「才八点，睡什么睡」），不要将错就错跟着错的时间演")
+
     return "\n".join(lines)
+
+
+def skip_to_morning(session_id, hour=7, minute=30):
+    """用户道晚安：剧情直接跳到明天早上，返回新时间信息。
+
+    同时把 last_seen 刷成现在，避免本次请求的 settle 再叠加推进。
+    """
+    clock = ensure_clock(session_id)
+    if clock is None:
+        return None
+
+    story = _parse(clock["story_now"]) or datetime.now()
+    target = (story + timedelta(days=1)).replace(
+        hour=hour, minute=minute, second=0, microsecond=0)
+    # 剧情本身在深夜（0-5点）的话，跳当天早上即可
+    if story.hour < 5:
+        target = story.replace(hour=hour, minute=minute, second=0, microsecond=0)
+
+    now_str = datetime.now().strftime(FMT)
+    db.set_story_clock(session_id, target.strftime(FMT), now_str)
+    logger.info("晚安跳转: %s → %s", story.strftime(FMT), target.strftime(FMT))
+    return {
+        "story_now": target.strftime(FMT),
+        "jumped_hours": round((target - story).total_seconds() / 3600.0, 1),
+    }

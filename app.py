@@ -14,13 +14,23 @@ import embedding
 import memory_retriever
 from log import setup_logging
 from routes import chat, memory, person, relation, admin, custom_llm, template, stt, openloop, family_template
+from routes import persona_api
 
 setup_logging()
 logger = logging.getLogger("app")
 
 
 async def index_handler(request):
-    """返回主页"""
+    """引导页（v0.13.0）：应用入口。选人、选对话、点进去才进聊天页。"""
+    with open(os.path.join(config.BASE_DIR, "templates", "guide.html"), "r", encoding="utf-8") as f:
+        return web.Response(text=f.read(), content_type="text/html")
+
+
+async def chat_page_handler(request):
+    """聊天页。支持 ?s=<session_id> 直接进入指定对话（引导页点进来时带）。"""
+    # 一个会话都没有 → 没什么可聊的，直接回引导页
+    if not db.get_all_sessions():
+        raise web.HTTPFound(location="/")
     with open(os.path.join(config.BASE_DIR, "templates", "index.html"), "r", encoding="utf-8") as f:
         return web.Response(text=f.read(), content_type="text/html")
 
@@ -31,8 +41,24 @@ async def admin_page_handler(request):
         return web.Response(text=f.read(), content_type="text/html")
 
 
+def _find_text_by_hash(text_hash):
+    """TTS 缓存未命中时，在 DB 消息里反查 hash 对应的回复原文（限每个会话最近100条）"""
+    import hashlib as _hl
+    try:
+        for s in db.get_all_sessions():
+            msgs = db.load_messages(s["id"])
+            for m in msgs[-100:]:
+                if m["role"] != "assistant":
+                    continue
+                if _hl.md5(m["content"].encode("utf-8", errors="ignore")).hexdigest()[:12] == text_hash:
+                    return m["content"]
+    except Exception as e:
+        logger.error("反查 TTS 原文失败: %s", e)
+    return None
+
+
 async def audio_handler(request):
-    """返回音频文件"""
+    """返回音频文件（懒生成：文件不在就现场合成，不再卡回复热路径）"""
     filename = request.match_info["filename"]
     filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), "audio", f"{filename}.mp3")
 
@@ -40,7 +66,25 @@ async def audio_handler(request):
         import tempfile
         filepath = os.path.join(tempfile.gettempdir(), f"tts_{filename}.mp3")
 
-    if os.path.exists(filepath):
+    if not os.path.exists(filepath):
+        # 先查本次进程的回复缓存，再反查 DB 消息
+        text = None
+        try:
+            from routes import chat as _chat
+            text = _chat._tts_text_cache.get(filename)
+        except Exception:
+            text = None
+        if not text:
+            text = _find_text_by_hash(filename)
+        if text:
+            try:
+                from tts import synthesize as tts_synthesize
+                filepath = await tts_synthesize(text)
+            except Exception as e:
+                logger.error("TTS 现场合成失败: %s", e)
+                return web.Response(status=500, text=f"合成失败: {e}")
+
+    if os.path.exists(filepath) and os.path.getsize(filepath) > 0:
         with open(filepath, "rb") as f:
             data = f.read()
         return web.Response(body=data, content_type="audio/mpeg")
@@ -105,19 +149,39 @@ def create_app():
     @web.middleware
     async def no_cache_frontend(request, handler):
         resp = await handler(request)
-        if request.path.startswith("/static") or request.path == "/" or request.path == "/index.html":
+        if (request.path.startswith("/static")
+                or request.path in ("/", "/index.html", "/chat")):
             resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
         return resp
 
-    app = web.Application(client_max_size=10 * 1024 * 1024, middlewares=[no_cache_frontend])
+    # 可选访问令牌鉴权：.env 配了 ACCESS_TOKEN 才启用；未配则零影响
+    @web.middleware
+    async def access_token_guard(request, handler):
+        if config.ACCESS_TOKEN:
+            token = (
+                request.query.get("token")
+                or request.headers.get("X-Access-Token")
+                or request.headers.get("Authorization", "").removeprefix("Bearer ").strip()
+            )
+            if token != config.ACCESS_TOKEN:
+                raise web.HTTPUnauthorized(
+                    text="访问令牌无效", content_type="text/plain"
+                )
+        return await handler(request)
+
+    middlewares = [no_cache_frontend] + ([access_token_guard] if config.ACCESS_TOKEN else [])
+    app = web.Application(client_max_size=10 * 1024 * 1024, middlewares=middlewares)
 
     async def on_cleanup(app):
         db.close_conn()
     app.on_cleanup.append(on_cleanup)
 
-    # 主页
+    # 引导页（应用入口）
     app.router.add_get("/", index_handler)
-    app.router.add_get("/index.html", index_handler)
+
+    # 聊天页（?s=xxx 直接进指定对话）
+    app.router.add_get("/chat", chat_page_handler)
+    app.router.add_get("/index.html", chat_page_handler)
 
     # 后台管理页面
     app.router.add_get("/admin", admin_page_handler)
@@ -146,6 +210,9 @@ def create_app():
     app.router.add_get("/api/proposals", chat.get_proposals_handler)
     app.router.add_post("/api/proposals/accept", chat.accept_proposal_handler)
     app.router.add_post("/api/proposals/reject", chat.reject_proposal_handler)
+
+    # 角色人格 / 世界模板 / 对话式引导（v0.12.0）
+    persona_api.setup(app)
 
     # 记忆
     app.router.add_get("/memories", memory.list_memories)

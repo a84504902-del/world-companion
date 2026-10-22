@@ -14,6 +14,7 @@ import re
 from datetime import datetime, timedelta
 
 import db
+from prompts import get_prompt
 
 logger = logging.getLogger("loops")
 
@@ -41,9 +42,11 @@ def looks_like_promise(text):
     return has_time or has_promise
 
 
+# v0.16.0：文案搬进 prompts/tasks.json（tasks.loops_extract / tasks.loops_system），
+# 此常量仅作 default 兜底。改文案请改 prompts/tasks.json，改完秒生效，不用重启。
 _EXTRACT_PROMPT = """判断下面这句话里，有没有一件**他明确答应、约定要为她做**的事。
 
-对方说的话：{user_text}
+对方说的话：{{USER_TEXT}}
 
 判断标准：
 - 必须是**他明确说出来的约定**：带她去做什么、给她什么、陪她做什么、答应她什么。
@@ -58,13 +61,13 @@ _EXTRACT_PROMPT = """判断下面这句话里，有没有一件**他明确答应
   绝对不要添加"因此不能陪她""所以她会失望"这类推断出来的内容。
 
 如果有，只输出一行 JSON，不要任何其他文字：
-{{"has": true, "content": "用她的视角重写的约定，一句话", "due": "明天/周末/下次/等我有空/以后/无", "weight": 3}}
+{"has": true, "content": "用她的视角重写的约定，一句话", "due": "明天/周末/下次/等我有空/以后/无", "weight": 3}
 
 weight 取值 1-5：
 1=随口一提  2=普通期待  3=认真说的  4=跟情绪挂钩  5=核心承诺
 
 如果没有，只输出：
-{{"has": false}}"""
+{"has": false}"""
 
 
 _EXTRACT_SYSTEM = "你是一个严谨的信息抽取器。严格按要求的 JSON 格式输出，不要任何解释文字。"
@@ -86,13 +89,13 @@ def make_llm_call(preferred_mode="deepseek"):
     def _call(messages):
         payload = messages[-1]["content"]
         text = _llm.chat(payload, mode=preferred_mode,
-                         system_prompt=_EXTRACT_SYSTEM, history=[])
+                         system_prompt=get_prompt("tasks.loops_system", default=_EXTRACT_SYSTEM), history=[])
         if _is_error(text):
             fallback = "deepseek" if preferred_mode != "deepseek" else "agnes"
             if fallback != preferred_mode:
                 logger.warning("抽取模型 %s 不可用，回退到 %s", preferred_mode, fallback)
                 text = _llm.chat(payload, mode=fallback,
-                                 system_prompt=_EXTRACT_SYSTEM, history=[])
+                                 system_prompt=get_prompt("tasks.loops_system", default=_EXTRACT_SYSTEM), history=[])
         return text
 
     return _call
@@ -143,7 +146,8 @@ def extract_loop(user_text, session_id, llm_call):
         return None
 
     try:
-        messages = [{"role": "user", "content": _EXTRACT_PROMPT.format(user_text=user_text[:500])}]
+        messages = [{"role": "user", "content": get_prompt(
+        "tasks.loops_extract", default=_EXTRACT_PROMPT, USER_TEXT=user_text[:500])}]
         raw = llm_call(messages)
         if not raw:
             return None

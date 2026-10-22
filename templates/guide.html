@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Companion</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="guide-body">
+    <div class="guide-wrap">
+        <!-- 顶部：标题 + 少量全局入口 -->
+        <header class="guide-head">
+            <div class="guide-brand">
+                <h1>World Companion</h1>
+                <p class="guide-sub" id="guideSub">选一个人，开始说话</p>
+            </div>
+            <div class="guide-head-actions">
+                <a href="/admin" class="btn btn-sm">后台管理</a>
+                <span class="app-version" id="appVersion"></span>
+            </div>
+        </header>
+
+        <main class="guide-main" id="guideMain">
+            <!-- 继续上次对话：最大的一张卡，回访最常用 -->
+            <section class="guide-sec" id="secContinue" style="display:none;">
+                <div class="guide-sec-head">
+                    <h2>继续上次</h2>
+                </div>
+                <div class="continue-card" id="continueCard">
+                    <div class="cc-left">
+                        <div class="cc-title" id="ccTitle"></div>
+                        <div class="cc-preview" id="ccPreview"></div>
+                        <div class="cc-meta" id="ccMeta"></div>
+                    </div>
+                    <button class="btn btn-primary cc-btn" id="ccBtn">继续 →</button>
+                </div>
+            </section>
+
+            <!-- 和谁聊：角色入口 -->
+            <section class="guide-sec" id="secPersonas">
+                <div class="guide-sec-head">
+                    <h2>和谁聊</h2>
+                    <span class="hint">点「开聊」就用这个角色开始一段新对话</span>
+                    <span class="hint" id="pCount"></span>
+                </div>
+                <div class="persona-grid" id="personaGrid"></div>
+            </section>
+
+            <!-- 全部历史对话 -->
+            <section class="guide-sec" id="secSessions">
+                <div class="guide-sec-head">
+                    <h2>全部对话</h2>
+                    <span class="hint" id="sCount"></span>
+                </div>
+                <div class="session-grid" id="sessionGrid"></div>
+            </section>
+
+            <!-- 新建 -->
+            <section class="guide-sec">
+                <div class="guide-sec-head">
+                    <h2>新建</h2>
+                </div>
+                <div class="new-grid">
+                    <button class="new-card" id="btnNewChat">
+                        <span class="nc-icon">💬</span>
+                        <span class="nc-title">空白对话</span>
+                        <span class="nc-desc">什么都不设，直接开聊</span>
+                    </button>
+                    <button class="new-card" id="btnGuide">
+                        <span class="nc-icon">📋</span>
+                        <span class="nc-title">表单建世界</span>
+                        <span class="nc-desc">固定项目填一遍，剩下的 AI 补全润色</span>
+                    </button>
+                    <button class="new-card" id="btnQuick">
+                        <span class="nc-icon">⚡</span>
+                        <span class="nc-title">一句话建对话</span>
+                        <span class="nc-desc">只说一句话，AI 展开成完整设定</span>
+                    </button>
+                    <button class="new-card" id="btnTemplate">
+                        <span class="nc-icon">🌍</span>
+                        <span class="nc-title">管理世界模板</span>
+                        <span class="nc-desc">套用开对话、改设定、复制一份</span>
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <footer class="guide-foot">
+            <span id="guideStats"></span>
+        </footer>
+    </div>
+
+    <!-- ============ 表单建世界（v0.17.2，固定字段 + AI 补全）============ -->
+    <div class="modal" id="formWizardModal" style="display: none;">
+        <div class="modal-content" style="width: 560px; max-height: 86vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h3>📋 表单建世界</h3>
+                <button class="modal-close" onclick="fwClose()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="fw-stepper" id="fwStepper"></div>
+
+                <div class="fw-step" id="fwStep1">
+                    <p class="fw-note">先定<b>题目</b>——这段对话的标题。比如「云溪小筑」。它所在的大世界（如「云岚大陆」）和你生活的地方，想填就填，留空 AI 补。</p>
+                    <div class="form-group">
+                        <label class="form-label">话题题目 <span class="fw-req">*</span></label>
+                        <input id="fwTitle" class="input" placeholder="例如：云溪小筑">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">题材 <span class="fw-req">*</span></label>
+                        <select id="fwGenre" class="input">
+                            <option value="">选一个</option>
+                            <option>现代都市</option><option>古代</option><option>架空修真</option>
+                            <option>校园</option><option>悬疑</option><option>科幻</option><option>其他</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">大世界 <span class="fw-opt">选填，留空 AI 补</span></label>
+                        <input id="fwWorldName" class="input" placeholder="例如：云岚大陆">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">你生活的地方 <span class="fw-opt">选填，留空 AI 补</span></label>
+                        <input id="fwPlace" class="input" placeholder="例如：与世隔绝的私人空间，只有家人朋友能进">
+                    </div>
+                </div>
+
+                <div class="fw-step" id="fwStep2" style="display:none;">
+                    <p class="fw-note">这一步填的是<b>你自己</b>——这个名字代表你本人，AI 永远不会扮演它。</p>
+                    <div class="form-group">
+                        <label class="form-label">你在这个世界叫什么 <span class="fw-req">*</span></label>
+                        <input id="fwUserName" class="input" placeholder="例如：林风">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">你的身份 <span class="fw-opt">选填，留空 AI 补</span></label>
+                        <input id="fwUserRole" class="input" placeholder="例如：云溪小筑的主人">
+                    </div>
+                </div>
+
+                <div class="fw-step" id="fwStep3" style="display:none;">
+                    <p class="fw-note">这一步是<b>对话对象</b>——由 AI 扮演、陪你聊天的那个人，<b>不是你自己</b>。</p>
+                    <div class="form-group">
+                        <label class="form-label">他/她叫什么 <span class="fw-req">*</span></label>
+                        <input id="fwCharName" class="input" placeholder="例如：夏雪">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">性格气质 <span class="fw-req">*</span></label>
+                        <input id="fwCharTraits" class="input" placeholder="几个词就行，例如：开朗、大方、风趣">
+                        <span class="fw-opt">AI 会把你这几个词扩写成完整人设</span>
+                    </div>
+                </div>
+
+                <div class="fw-step" id="fwStep4" style="display:none;">
+                    <div class="form-group">
+                        <label class="form-label">你们的关系 <span class="fw-req">*</span></label>
+                        <select id="fwRelation" class="input">
+                            <option value="">选一个</option>
+                            <option>恋人</option><option>家人</option><option>同事同学</option>
+                            <option>刚认识</option><option>暧昧</option><option>其他</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">怎么认识的、希望怎么相处 <span class="fw-opt">选填，留空 AI 补</span></label>
+                        <textarea id="fwRelationNote" class="prompt-textarea" rows="2" placeholder="例如：从小一起长大，她爱撒娇我爱逗她"></textarea>
+                    </div>
+                </div>
+
+                <div class="fw-step" id="fwStep5" style="display:none;">
+                    <div class="form-group">
+                        <label class="form-label">这个世界里还有谁 <span class="fw-opt">选填，可空</span></label>
+                        <textarea id="fwCastDesc" class="prompt-textarea" rows="3" placeholder="例如：有个话不多的妈、读大学的妹妹。没有别人就留空。"></textarea>
+                    </div>
+                </div>
+
+                <!-- 预览面板：AI 把空格补齐后展示 -->
+                <div id="fwPreviewPanel" style="display:none;">
+                    <div class="fw-preview" id="fwPreviewText"></div>
+                </div>
+
+                <div class="form-actions">
+                    <button class="btn" id="fwBackBtn" onclick="fwBack()" style="visibility:hidden;">← 上一步</button>
+                    <button class="btn" onclick="fwClose()">取消</button>
+                    <button class="btn btn-primary" id="fwNextBtn" onclick="fwNext()">下一步 →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ 快速建对话（一句话）============ -->
+    <div class="modal" id="quickCreateModal" style="display: none;">
+        <div class="modal-content" style="width: 520px;">
+            <div class="modal-header">
+                <h3>⚡ 快速建对话</h3>
+                <button class="modal-close" onclick="closeAllModals()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="prompt-hint">只给一句话，AI 会读完全部上下文（世界模板、已有角色、称呼关系）自己推导出完整人设：性格、说话方式、规则、语气样例全套，并直接落成一个能聊的对话。</p>
+                <div id="quickTplBanner" class="tpl-preset-banner" style="display: none;"></div>
+                <div class="form-group">
+                    <label class="form-label">主要人物叫什么</label>
+                    <input id="quickNameInput" class="input" placeholder="例如：夏琳">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">一句话描述</label>
+                    <textarea id="quickSummaryInput" class="prompt-textarea" rows="3" placeholder="例如：夏雪的妹妹，读大学的，有点闷骚"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">世界设定</label>
+                    <select id="quickTplSelect" class="input"></select>
+                </div>
+                <div class="form-actions">
+                    <button class="btn" onclick="closeAllModals()">取消</button>
+                    <button id="quickCreateBtn" class="btn btn-primary" onclick="quickCreateSubmit()">生成</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ 世界模板管理 ============ -->
+    <div class="modal" id="tplFormModal" style="display: none;">
+        <div class="modal-content" style="width: 560px; max-height: 86vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h3 id="tplFormTitle">新建世界模板</h3>
+                <button class="modal-close" onclick="closeAllModals()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input id="tplIdInput" type="hidden">
+                <div class="form-group">
+                    <label class="form-label">模板名</label>
+                    <input id="tplNameInput" class="input" placeholder="例如：现代都市·两家亲戚">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">题材</label>
+                    <input id="tplGenreInput" class="input" placeholder="现代都市 / 古代 / 架空修真...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">时代与地点</label>
+                    <input id="tplEraInput" class="input" placeholder="具体到能影响说话方式">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">一句话概述</label>
+                    <input id="tplSummaryInput" class="input" placeholder="这个世界大致是什么样">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">主要圈层<span class="hint">一行一条</span></label>
+                    <textarea id="tplFactionsInput" class="prompt-textarea" rows="4" placeholder="夏家（女方）：夏海、沈青、夏雪、夏琳&#10;同事圈与邻里圈：日常寒暄、串门"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">日常惯例<span class="hint">影响称呼与说话方式</span></label>
+                    <textarea id="tplCustomsInput" class="prompt-textarea" rows="3" placeholder="亲戚之间称呼按辈分：爸、妈、姐、哥&#10;不确定辈分时直接叫名字"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">内容边界<span class="hint">能聊什么，不碰什么</span></label>
+                    <textarea id="tplBoundariesInput" class="prompt-textarea" rows="2" placeholder="话题围绕家庭关系、日常生活&#10;辈分称呼必须准确"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button class="btn" onclick="closeAllModals()">取消</button>
+                    <button class="btn btn-primary" onclick="saveTemplateForm()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ 角色详情 ============ -->
+    <div class="modal" id="personaDetailModal" style="display: none;">
+        <div class="modal-content" style="width: 620px; max-height: 86vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h3 id="personaDetailName">角色详情</h3>
+                <button class="modal-close" onclick="closeAllModals()">&times;</button>
+            </div>
+            <div class="modal-body" id="personaDetailBody"></div>
+        </div>
+    </div>
+
+    <script type="module" src="/static/js/guide.js"></script>
+</body>
+</html>

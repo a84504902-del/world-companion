@@ -13,18 +13,19 @@ import logging
 import re
 
 import db
+from prompts import get_prompt
 
 logger = logging.getLogger("scene")
 
 _SCENE_PROMPT = """根据下面这段对话，判断"现在"的场景状态。
 
-当前已知场景：{current}
+当前已知场景：{{CURRENT}}
 
 最近的对话：
-{convo}
+{{CONVO}}
 
 只输出一行 JSON，不要任何解释：
-{{"place": "她在哪", "her_doing": "她正在做的具体事情", "user_place": "你在哪"}}
+{"place": "她在哪", "her_doing": "她正在做的具体事情", "user_place": "你在哪"}
 
 要求：
 - 只根据对话内容判断，不要编造没提到的事
@@ -35,6 +36,10 @@ _SCENE_PROMPT = """根据下面这段对话，判断"现在"的场景状态。
 - 每项都很短，不超过 10 字
 """
 
+# v0.16.0：文案搬进 prompts/tasks.json（key: tasks.scene_extract / tasks.scene_system），
+# 此常量仅作 default 兜底。改文案请改 prompts/tasks.json，改完秒生效，不用重启。
+
+# v0.16.0：文案搬进 prompts/tasks.json（tasks.scene_system），此常量仅兜底
 _EXTRACT_SYSTEM = "你是一个严谨的场景状态提取器。只输出一行 JSON，不要任何解释文字。"
 
 # 这些占位词不算有效值，过滤掉以免污染状态条
@@ -57,13 +62,13 @@ def make_llm_call(preferred_mode="deepseek"):
     def _call(messages):
         payload = messages[-1]["content"]
         text = _llm.chat(payload, mode=preferred_mode,
-                         system_prompt=_EXTRACT_SYSTEM, history=[])
+                         system_prompt=get_prompt("tasks.scene_system", default=_EXTRACT_SYSTEM), history=[])
         if _is_error(text):
             fallback = "deepseek" if preferred_mode != "deepseek" else "agnes"
             if fallback != preferred_mode:
                 logger.warning("场景提取模型 %s 不可用，回退到 %s", preferred_mode, fallback)
                 text = _llm.chat(payload, mode=fallback,
-                                 system_prompt=_EXTRACT_SYSTEM, history=[])
+                                 system_prompt=get_prompt("tasks.scene_system", default=_EXTRACT_SYSTEM), history=[])
         return text
 
     return _call
@@ -81,9 +86,18 @@ def extract_scene(session_id, llm_call):
         return None
 
     recent = messages[-6:]
+    # 人称称谓从人格库动态取（v0.12.0 前硬编码"林风/夏雪"）
+    _user_label, _her_label = "用户", "她"
+    try:
+        import persona_store
+        _pa = persona_store.active_persona() or {}
+        _her_label = _pa.get("name") or "她"
+        _user_label = _pa.get("user_name") or "用户"
+    except Exception:
+        pass
     lines = []
     for m in recent:
-        who = "用户（林风）" if m.get("role") == "user" else "她（夏雪）"
+        who = f"用户（{_user_label}）" if m.get("role") == "user" else f"她（{_her_label}）"
         lines.append(f"{who}：{str(m.get('content',''))[:120]}")
     convo = "\n".join(lines)
 
@@ -93,7 +107,9 @@ def extract_scene(session_id, llm_call):
                f"你={cur.get('user_place') or '未知'}")
 
     try:
-        prompt = _SCENE_PROMPT.format(current=current, convo=convo)
+        # v0.16.0：文案在 prompts/tasks.json，此处常量仅兜底
+        prompt = get_prompt("tasks.scene_extract", default=_SCENE_PROMPT,
+                            CURRENT=current, CONVO=convo)
         raw = llm_call([{"role": "user", "content": prompt}])
         if not raw:
             return None

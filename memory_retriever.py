@@ -1,16 +1,21 @@
 """记忆检索模块 — 对话原文分块检索（episodic）+ 手动保存记忆（semantic），严格会话隔离"""
 import asyncio
 import logging
+from collections import deque
 
 import db
+from prompts import get_prompt
 import embedding
 
 logger = logging.getLogger("retriever")
 
 # 内存中的记忆向量缓存: [{id, memory_id, embedding, content, tags, session_id}]
-_vector_cache = []
+# 上限 2000 条：长期挂机每 3 轮加一个原文块，不设限会单调涨（384 维 ≈ 5KB/条）。
+# 超限丢最旧的——DB 里仍有全量，真需要时走库查询，内存只当热缓存。
+CACHE_MAX_ENTRIES = 2000
+_vector_cache = deque(maxlen=CACHE_MAX_ENTRIES)
 # 内存中的对话原文分块向量缓存: [{chunk_id, embedding, content, session_id}]
-_chunk_cache = []
+_chunk_cache = deque(maxlen=CACHE_MAX_ENTRIES)
 _cache_loaded = False
 
 # 每 3 轮对话（1 轮 = user + assistant 两条消息）切一个原文块
@@ -24,7 +29,7 @@ def preload_cache():
         return
     try:
         rows = db.get_all_memory_embeddings()
-        _vector_cache = []
+        _vector_cache = deque(maxlen=CACHE_MAX_ENTRIES)
         for r in rows:
             vec = embedding.vector_from_json(r["embedding"])
             if vec:
@@ -38,7 +43,7 @@ def preload_cache():
                 })
         # 对话原文分块向量
         chunk_rows = db.get_all_chunk_embeddings()
-        _chunk_cache = []
+        _chunk_cache = deque(maxlen=CACHE_MAX_ENTRIES)
         for r in chunk_rows:
             vec = embedding.vector_from_json(r["embedding"])
             if vec:
@@ -84,25 +89,47 @@ def add_chunk_to_cache(chunk_id, embedding_vec, content, session_id=""):
 def remove_from_cache(memory_id):
     """从缓存中删除指定记忆的向量"""
     global _vector_cache
-    _vector_cache = [v for v in _vector_cache if v["memory_id"] != memory_id]
+    _vector_cache = deque(
+        (v for v in _vector_cache if v["memory_id"] != memory_id),
+        maxlen=CACHE_MAX_ENTRIES)
 
 
 def clear_cache_by_session(session_id):
     """删除会话后同步清理该会话的所有向量缓存（记忆 + 原文块），防止残留"""
     global _vector_cache, _chunk_cache
-    _vector_cache = [v for v in _vector_cache if v.get("session_id") != session_id]
-    _chunk_cache = [c for c in _chunk_cache if c.get("session_id") != session_id]
+    _vector_cache = deque(
+        (v for v in _vector_cache if v.get("session_id") != session_id),
+        maxlen=CACHE_MAX_ENTRIES)
+    _chunk_cache = deque(
+        (c for c in _chunk_cache if c.get("session_id") != session_id),
+        maxlen=CACHE_MAX_ENTRIES)
 
 
 def clear_all_cache():
     """清空内存向量缓存（一次性清理历史脏数据后调用）"""
     global _vector_cache, _chunk_cache
-    _vector_cache = []
-    _chunk_cache = []
+    _vector_cache = deque(maxlen=CACHE_MAX_ENTRIES)
+    _chunk_cache = deque(maxlen=CACHE_MAX_ENTRIES)
 
 
-def retrieve_relevant_memories(query, session_id="", top_k=5, min_score=0.3):
+# 手动保存记忆的检索阈值（v0.13.2 从 0.3 提到 0.55）
+#
+# 为什么调：0.3 是给英文模型 all-MiniLM-L6-v2 定的，但那个模型不认中文
+# （实测中文丢失率 70%，满屏 [UNK]），导致正负样本严重重叠——0.3 阈值下
+# 误召率高达 93.6%，「你几岁」也会把「我讨厌香菜」拽进上下文。
+# 换成 bge-small-zh-v1.5 后（中文丢失率 0%），实测：
+#   阈值 0.50 → 召回 100%，误召 2.7%
+#   阈值 0.55 → 召回 90%， 误召 0.9%   ← 选这个
+#   阈值 0.60 → 召回 70%， 误召 0.9%   ← 召回掉得太狠
+# 想复现这组数：`python tools/rebuild_vectors.py --check` 里有中文识别自检，
+# 换模型后务必重跑一次实测再定阈值。
+MEMORY_MIN_SCORE = 0.55
+
+
+def retrieve_relevant_memories(query, session_id="", top_k=5, min_score=None):
     """语义检索：只返回当前会话中与 query 最相关的 top_k 条手动保存的记忆（严格会话隔离）"""
+    if min_score is None:
+        min_score = MEMORY_MIN_SCORE
     if not _vector_cache:
         return []
 
@@ -167,13 +194,16 @@ def build_memory_context(query, session_id="", top_k=5):
     chunks = retrieve_chunks(query, session_id, top_k=3)
     if chunks:
         chunk_text = "\n\n".join(c["content"] for c in chunks)
-        parts.append(f"【过往对话片段（与当前话题可能相关）】\n{chunk_text}")
+        # v0.16.0：段标题在 prompts/memory.json（memory.chunk_header），此处仅兜底
+        parts.append(get_prompt("memory.chunk_header",
+                                default="【过往对话片段（与当前话题可能相关）】\n") + chunk_text)
 
     # 2. 手动保存的记忆
     memories = retrieve_relevant_memories(query, session_id, top_k)
     if memories:
         lines = [f"- {m['content']}" for m in memories]
-        parts.append("【保存的记忆】\n" + "\n".join(lines))
+        parts.append(get_prompt("memory.saved_header",
+                                default="【保存的记忆】\n") + "\n".join(lines))
 
     return "\n\n".join(parts)
 
@@ -189,7 +219,7 @@ def store_memory_with_embedding(content, tags="", session_id="", source="manual"
         emb_json = embedding.vector_to_json(vec)
         db.save_memory_embedding(memory_id, emb_json, content)
         add_to_cache(memory_id, vec, content, tags, session_id)
-        logger.info("记忆已存储+向量化: id=%s, session=%s, content=%s...", memory_id, session_id[:20], content[:30])
+        logger.info("记忆已存储+向量化: id=%s, session=%s, 字数=%d", memory_id, session_id[:20], len(content))
 
     return memory_id
 

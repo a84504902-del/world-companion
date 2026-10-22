@@ -76,8 +76,8 @@ async function loadLLMConfig() {
                     <p style="font-size: 12px; color: #999;">${escapeHtml(llm.base_url)}</p>
                 </div>
                 <div style="display: flex; gap: 8px; align-items: center;">
-                    <span class="badge ${llm.api_key ? 'badge-green' : 'badge-gray'}">
-                        ${llm.api_key ? '已配置' : '未配置'}
+                    <span class="badge ${llm.has_key ? 'badge-green' : 'badge-gray'}">
+                        ${llm.has_key ? '已配置' : '未配置'}
                     </span>
                     <button class="btn btn-primary btn-sm" onclick="editLLM('${llm.id}')">编辑</button>
                     <button class="btn btn-danger btn-sm" onclick="deleteLLM('${llm.id}', ${!!llm.builtin})">${llm.builtin ? '清空' : '删除'}</button>
@@ -263,6 +263,10 @@ async function testLLM() {
         document.getElementById('llmTestResult').innerHTML = '<p style="color: red;">请填写 API 地址和模型名</p>';
         return;
     }
+    if (apiKey.includes('***')) {
+        document.getElementById('llmTestResult').innerHTML = '<p style="color: orange;">输入框里是脱敏值（***），测试前请填入完整 API Key</p>';
+        return;
+    }
 
     document.getElementById('llmTestResult').innerHTML = '<p>正在测试...</p>';
 
@@ -300,7 +304,9 @@ async function submitLLM() {
 
     try {
         const url = id ? '/api/llms/update' : '/api/llms/add';
-        const body = { name, desc, base_url: baseUrl, api_key: apiKey, model };
+        const body = { name, desc, base_url: baseUrl, model };
+        // 含 *** 的是脱敏回显值：用户没改 Key，不传该字段（后端保持原值）
+        if (apiKey && !apiKey.includes('***')) body.api_key = apiKey;
         if (id) body.id = id;
 
         const resp = await fetch(url, {

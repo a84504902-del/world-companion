@@ -5,7 +5,13 @@ import { escapeHtml, renderMarkdown } from './utils.js';
 let abortController = null;
 
 // 回复长度模式：short / normal / long
-let lengthMode = localStorage.getItem('lengthMode') || 'normal';
+// v0.15.2：默认 normal → long（normal 以前没有提示词定义，等于没长度引导，回复发干）
+let lengthMode = localStorage.getItem('lengthMode') || 'long';
+
+// 页面加载时把按钮选中态同步到当前模式（修掉「 localStorage 存过旧值但高亮还停在标准」的错位）
+document.querySelectorAll('.length-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.mode === lengthMode);
+});
 
 export function setLengthMode(mode) {
     lengthMode = mode;
@@ -55,10 +61,31 @@ export function restoreGroupModeButton() {
     }
 }
 
+// ===== 历史分页（修复长会话全量渲染卡顿）=====
+const HISTORY_PAGE = 200;      // 每次渲染/加载的消息条数
+let _histLoaded = 0;           // 已加载的消息条数（从最新往前数）
+let _histTotal = 0;            // 会话消息总数
+let _histLoading = false;      // 正在加载更早消息（防重复触发）
+let _histScrollBound = false;  // 滚动监听是否已绑定
+
+// 单条消息 HTML（renderMessages 和上滚加载共用）
+function messageHtml(msg, prevTs) {
+    const fromHer = msg.role === 'assistant' || msg.role === 'proactive';
+    const content = fromHer ? renderMarkdown(stripState(msg.content)) : escapeHtml(msg.content);
+    const timeStr = msg.timestamp ? formatTime(msg.timestamp) : '';
+    const cls = msg.role === 'proactive' ? 'message assistant proactive' : `message ${msg.role}`;
+    return dividerHtml(prevTs, msg.timestamp)
+        + `<div class="${cls}"><div class="message-content">${content}</div>`
+        + `${timeStr ? `<div class="message-time">${timeStr}</div>` : ''}</div>`;
+}
+
 export async function loadHistory() {
     try {
-        const resp = await fetch('/history');
+        const sid = state.currentSession || '';
+        const resp = await fetch(`/history?session_id=${sid}&limit=${HISTORY_PAGE}`);
         const data = await resp.json();
+        _histLoaded = (data.history || []).length;
+        _histTotal = data.total != null ? data.total : _histLoaded;
         renderMessages(data.history);
         // 恢复这个会话记住的模型（对话1 用 DeepSeek、对话2 用 agnes）
         const mem = await import('./memory.js');
@@ -68,6 +95,52 @@ export async function loadHistory() {
     }
     // 看她有没有在你不在的时候留过言（够了就补几条进来）
     checkProactive();
+}
+
+// 上滚到顶时加载更早的消息：直接往容器顶部插 DOM，不重绘现有节点
+// （重绘会弄丢正在流式生成的消息，也会打断用户滚动位置）
+async function loadEarlierMessages() {
+    if (_histLoading || _histLoaded >= _histTotal) return;
+    _histLoading = true;
+    try {
+        const container = document.getElementById('chatMessages');
+        const prevHeight = container.scrollHeight;
+        const prevTop = container.scrollTop;
+        const sid = state.currentSession || '';
+        // 更早一页的起点：总数 - 已加载 - 一页
+        const offset = Math.max(0, _histTotal - _histLoaded - HISTORY_PAGE);
+        const resp = await fetch(`/history?session_id=${sid}&limit=${HISTORY_PAGE}&offset=${offset}`);
+        const data = await resp.json();
+        const earlier = data.history || [];
+        if (earlier.length) {
+            _histLoaded += earlier.length;
+            let html = '';
+            let prevTs = null;
+            for (const msg of earlier) {
+                html += messageHtml(msg, prevTs);
+                if (msg.timestamp) prevTs = msg.timestamp;
+            }
+            container.insertAdjacentHTML('afterbegin', html);
+            // 保持视口不动：补了多少高度就补多少 scrollTop
+            container.scrollTop = container.scrollHeight - prevHeight + prevTop;
+            console.log('[history] 加载更早消息', earlier.length, '条，共', _histLoaded, '/', _histTotal);
+        }
+    } catch (e) {
+        console.error('加载更早消息失败:', e);
+    } finally {
+        _histLoading = false;
+    }
+}
+
+// 绑定上滚加载监听（只绑一次）
+function bindHistoryScroll() {
+    if (_histScrollBound) return;
+    const container = document.getElementById('chatMessages');
+    if (!container) return;
+    _histScrollBound = true;
+    container.addEventListener('scroll', () => {
+        if (container.scrollTop < 80) loadEarlierMessages();
+    });
 }
 
 export async function checkProactive() {
@@ -84,8 +157,10 @@ export async function checkProactive() {
 
         console.log('[catchup] 她留了', msgs.length, '条言');
         // 重新加载历史，让留言按时间出现在正确的位置
-        const r2 = await fetch('/history');
+        const r2 = await fetch(`/history?session_id=${state.currentSession || ''}&limit=${HISTORY_PAGE}`);
         const d2 = await r2.json();
+        _histLoaded = (d2.history || []).length;
+        _histTotal = d2.total != null ? d2.total : _histLoaded;
         renderMessages(d2.history);
         loadStatusBar();
     } catch (e) {
@@ -116,20 +191,12 @@ export function renderMessages(history) {
     let html = '';
     let prevTs = null;
     for (const msg of history || []) {
-        html += dividerHtml(prevTs, msg.timestamp);
-        const fromHer = msg.role === 'assistant' || msg.role === 'proactive';
-        const content = fromHer ? renderMarkdown(stripState(msg.content)) : escapeHtml(msg.content);
-        const timeStr = msg.timestamp ? formatTime(msg.timestamp) : '';
-        // proactive = 她单方面发来的留言，加个类做视觉区分
-        const cls = msg.role === 'proactive'
-            ? 'message assistant proactive'
-            : `message ${msg.role}`;
-        html += `<div class="${cls}"><div class="message-content">${content}</div>`
-            + `${timeStr ? `<div class="message-time">${timeStr}</div>` : ''}</div>`;
+        html += messageHtml(msg, prevTs);
         if (msg.timestamp) prevTs = msg.timestamp;
     }
     container.innerHTML = html;
     container.scrollTop = container.scrollHeight;
+    bindHistoryScroll();
     loadStatusBar();
 }
 
@@ -312,9 +379,13 @@ export async function cancelGeneration() {
         abortController = null;
     }
 
-    // 通知后端取消
+    // 通知后端取消（带 session_id：只打断自己这个标签页的生成）
     try {
-        await fetch('/api/cancel_chat', { method: 'POST' });
+        await fetch('/api/cancel_chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ session_id: state.currentSession || '' })
+        });
     } catch (e) {
         // 忽略
     }
@@ -366,7 +437,7 @@ export async function sendMessage() {
         const resp = await fetch('/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text, mode, length_mode: lengthMode, group_mode: groupMode }),
+            body: JSON.stringify({ text, mode, length_mode: lengthMode, group_mode: groupMode, session_id: state.currentSession || '' }),
             signal: abortController.signal
         });
 
@@ -550,7 +621,7 @@ export function stopAudio() {
 // 检测人物提案（AI 后台检测新人物 → 用户确认后入库）
 async function checkCharacterProposals() {
     try {
-        const resp = await fetch('/api/proposals');
+        const resp = await fetch(`/api/proposals?session_id=${state.currentSession || ''}`);
         const data = await resp.json();
         if (!data.proposals || data.proposals.length === 0) return;
 

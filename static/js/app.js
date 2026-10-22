@@ -6,6 +6,25 @@ import * as sessions from './sessions.js';
 import * as memory from './memory.js';
 import * as loops from './loops.js';
 import * as ui from './ui.js';
+import * as personas from './personas.js';
+
+// 可选访问令牌：服务端 .env 配了 ACCESS_TOKEN 后，自动给所有请求带上
+// （优先 localStorage.access_token，其次地址栏 ?token=xxx，带过一次即记住）
+(function () {
+    let token = localStorage.getItem('access_token');
+    if (!token) {
+        const m = new URLSearchParams(location.search).get('token');
+        if (m) { token = m; try { localStorage.setItem('access_token', m); } catch (e) {} }
+    }
+    if (token) {
+        const origFetch = window.fetch;
+        window.fetch = function (input, init) {
+            init = init || {};
+            init.headers = Object.assign({}, init.headers, { 'X-Access-Token': token });
+            return origFetch.call(this, input, init);
+        };
+    }
+})();
 
 // 将所有需要被 HTML onclick 调用的函数暴露到 window
 Object.assign(window, {
@@ -33,6 +52,7 @@ Object.assign(window, {
     renameSession: sessions.renameSession,
     exportChat: sessions.exportChat,
     summarizeChat: sessions.summarizeChat,
+    goGuide: sessions.goGuide,
 
     // 未完结事件（她在等的事）
     loadLoops: loops.loadLoops,
@@ -80,6 +100,26 @@ Object.assign(window, {
     importFromFile: memory.importFromFile,
     openSearchModal: ui.openSearchModal,
     closeSearchModal: ui.closeSearchModal,
+
+    // 角色 / 世界模板 / 对话式引导（v0.12.0）
+    loadPersonas: personas.loadPersonas,
+    openOnboarding: personas.openOnboarding,
+    onboardingSend: personas.onboardingSend,
+    onboardingFinish: personas.onboardingFinish,
+    onboardingAbort: personas.onboardingAbort,
+    openQuickCreate: personas.openQuickCreate,
+    quickCreateSubmit: personas.quickCreateSubmit,
+    switchToPersona: personas.switchToPersona,
+    importSeedFromFile: personas.importSeedFromFile,
+    setAsProtagonist: personas.setAsProtagonist,
+    viewPersona: personas.viewPersona,
+    deletePersona: personas.deletePersona,
+    newTemplate: personas.newTemplate,
+    editTemplate: personas.editTemplate,
+    saveTemplateForm: personas.saveTemplateForm,
+    duplicateTemplate: personas.duplicateTemplate,
+    deleteTemplate: personas.deleteTemplate,
+    closeAllModals: personas.closeAllModals,
 });
 
 // 点击别处收起"更多"菜单

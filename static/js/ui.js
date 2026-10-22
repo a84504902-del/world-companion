@@ -88,4 +88,5 @@ export function switchTab(tab) {
     if (tab === 'memory') import('./memory.js').then(m => m.loadMemories());
     if (tab === 'people') import('./memory.js').then(m => m.loadPeople());
     if (tab === 'relations') import('./memory.js').then(m => m.loadRelations());
+    if (tab === 'personas') import('./personas.js').then(m => m.loadPersonas());
 }

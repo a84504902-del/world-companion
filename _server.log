@@ -1,0 +1,470 @@
+22:04:35 [app] INFO: 数据库已备份: E:\teams\world-companion\backups\memory_20261020_220435.db（保留最近 5 份）
+22:04:35 [app] INFO: AI Companion 启动中...
+22:04:35 [app] INFO: 访问地址: http://localhost:8877
+22:04:35 [app] INFO: 数据库: E:\teams\world-companion\memory.db
+22:04:35 [retriever] INFO: 向量缓存预加载完成: 记忆 0 条, 原文块 1 条
+22:04:46 [embedding] INFO: 从本地加载嵌入模型: E:\bus\models\embedding-zh
+22:04:46 [sentence_transformers.base.model] INFO: No device provided, using cpu
+22:04:46 [sentence_transformers.base.model] INFO: Loading SentenceTransformer model from E:\bus\models\embedding-zh.
+22:04:46 [embedding] INFO: 模型加载完成: E:\bus\models\embedding-zh（维度 512）
+22:04:46 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:46 +0800] "GET /api/status?session_id=__nope__ HTTP/1.1" 200 240 "-" "Python-urllib/3.13"
+22:04:47 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:47 +0800] "GET /api/loops/list?session_id=__nope__ HTTP/1.1" 200 172 "-" "Python-urllib/3.13"
+22:04:47 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:47 +0800] "POST /api/loops/add HTTP/1.1" 400 217 "-" "Python-urllib/3.13"
+22:04:47 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:47 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:47 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:47 +0800] "GET /api/loops/list?session_id=__nope__ HTTP/1.1" 200 455 "-" "Python-urllib/3.13"
+22:04:47 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:47 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:47 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:47 +0800] "GET /api/loops/list?session_id=__nope__ HTTP/1.1" 200 745 "-" "Python-urllib/3.13"
+22:04:48 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:48 +0800] "POST /api/loops/close HTTP/1.1" 200 171 "-" "Python-urllib/3.13"
+22:04:48 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:48 +0800] "POST /api/loops/close HTTP/1.1" 400 211 "-" "Python-urllib/3.13"
+22:04:48 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:48 +0800] "POST /api/loops/delete HTTP/1.1" 200 171 "-" "Python-urllib/3.13"
+22:04:48 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:48 +0800] "POST /api/loops/update HTTP/1.1" 200 171 "-" "Python-urllib/3.13"
+22:04:49 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:49 +0800] "POST /new_chat HTTP/1.1" 200 198 "-" "Python-urllib/3.13"
+22:04:49 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:49 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:50 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:50 +0800] "GET /api/loops/list?session_id=session_1792505089719 HTTP/1.1" 200 480 "-" "Python-urllib/3.13"
+22:04:50 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:50 +0800] "POST /api/loops/close HTTP/1.1" 200 171 "-" "Python-urllib/3.13"
+22:04:50 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:50 +0800] "GET /api/loops/list?session_id=session_1792505089719 HTTP/1.1" 200 172 "-" "Python-urllib/3.13"
+22:04:50 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:50 +0800] "GET /api/loops/list?session_id=session_1792505089719&all=1 HTTP/1.1" 200 517 "-" "Python-urllib/3.13"
+22:04:50 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:50 +0800] "POST /new_chat HTTP/1.1" 200 198 "-" "Python-urllib/3.13"
+22:04:50 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:50 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "GET /api/loops/list?session_id=session_1792505089719&all=1 HTTP/1.1" 200 517 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "GET /api/loops/list?session_id=session_1792505090729&all=1 HTTP/1.1" 200 475 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "GET /api/status?session_id=session_1792505089719 HTTP/1.1" 200 593 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "GET /api/status?session_id=session_1792505089719 HTTP/1.1" 200 593 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "GET /api/status?session_id=session_1792505089719 HTTP/1.1" 200 593 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "GET /api/status?session_id=session_1792505089719 HTTP/1.1" 200 593 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "GET /api/status?session_id=session_1792505089719 HTTP/1.1" 200 593 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "GET /api/status?session_id=session_1792505089719 HTTP/1.1" 200 593 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "GET /api/status?session_id=session_1792505089719 HTTP/1.1" 200 593 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "GET /api/status?session_id=session_1792505089719 HTTP/1.1" 200 593 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "GET /api/status?session_id=session_1792505089719 HTTP/1.1" 200 593 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "GET /api/status?session_id=session_1792505089719 HTTP/1.1" 200 593 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "GET /api/status?session_id=session_1792505089719 HTTP/1.1" 200 593 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "GET /api/status?session_id=session_1792505089719 HTTP/1.1" 200 593 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "GET /api/status?session_id=session_1792505089719 HTTP/1.1" 200 593 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "GET /api/status?session_id=session_1792505089719 HTTP/1.1" 200 593 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "GET /api/status?session_id=session_1792505089719 HTTP/1.1" 200 593 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "GET /api/status?session_id=session_1792505089719 HTTP/1.1" 200 593 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "GET /api/status?session_id=session_1792505089719 HTTP/1.1" 200 593 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "GET /api/status?session_id=session_1792505089719 HTTP/1.1" 200 593 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "GET /api/status?session_id=session_1792505089719 HTTP/1.1" 200 593 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "GET /api/status?session_id=session_1792505089719 HTTP/1.1" 200 593 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:51 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:51 +0800] "GET /api/loops/list?session_id=session_1792505089719&all=1 HTTP/1.1" 200 3378 "-" "Python-urllib/3.13"
+22:04:52 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:52 +0800] "GET /static/js/chat.js HTTP/1.1" 200 304 "-" "Python-urllib/3.13"
+22:04:52 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:52 +0800] "GET /static/js/chat.js HTTP/1.1" 200 304 "-" "Python-urllib/3.13"
+22:04:52 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:52 +0800] "GET /static/js/chat.js HTTP/1.1" 200 304 "-" "Python-urllib/3.13"
+22:04:52 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:52 +0800] "GET /static/js/app.js HTTP/1.1" 200 303 "-" "Python-urllib/3.13"
+22:04:52 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:52 +0800] "GET /static/js/ui.js HTTP/1.1" 200 302 "-" "Python-urllib/3.13"
+22:04:53 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:53 +0800] "GET /static/css/style.css HTTP/1.1" 200 290 "-" "Python-urllib/3.13"
+22:04:53 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:53 +0800] "GET /static/css/style.css HTTP/1.1" 200 290 "-" "Python-urllib/3.13"
+22:04:54 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:54 +0800] "POST /new_chat HTTP/1.1" 200 198 "-" "Python-urllib/3.13"
+22:04:54 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:54 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:54 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:54 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:54 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:54 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:54 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:54 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:54 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:54 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:54 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:54 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:54 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:54 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:54 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:54 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:54 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:54 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:54 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:54 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:54 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:54 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:54 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:54 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:54 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:54 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:54 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:54 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:54 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:54 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:54 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:54 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:54 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:54 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:54 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:54 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:54 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:54 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:54 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:54 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:54 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:54 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:54 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:54 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:54 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:54 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:54 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:54 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:54 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:54 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:54 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:54 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:54 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:54 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:54 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1724 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1754 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1844 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "GET /api/status?session_id=session_1792505094395 HTTP/1.1" 200 1874 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/close HTTP/1.1" 200 171 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/close HTTP/1.1" 200 171 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/delete HTTP/1.1" 200 171 "-" "Python-urllib/3.13"
+22:04:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/add HTTP/1.1" 200 183 "-" "Python-urllib/3.13"
+22:04:56 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:55 +0800] "POST /api/loops/close HTTP/1.1" 200 171 "-" "Python-urllib/3.13"
+22:04:56 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:56 +0800] "POST /api/loops/close HTTP/1.1" 200 171 "-" "Python-urllib/3.13"
+22:04:56 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:56 +0800] "POST /api/loops/delete HTTP/1.1" 200 171 "-" "Python-urllib/3.13"
+22:04:56 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:56 +0800] "POST /api/loops/delete HTTP/1.1" 200 171 "-" "Python-urllib/3.13"
+22:04:56 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:56 +0800] "POST /api/loops/close HTTP/1.1" 200 171 "-" "Python-urllib/3.13"
+22:04:56 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:56 +0800] "POST /api/loops/close HTTP/1.1" 200 171 "-" "Python-urllib/3.13"
+22:04:56 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:56 +0800] "POST /api/loops/delete HTTP/1.1" 200 171 "-" "Python-urllib/3.13"
+22:04:56 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:56 +0800] "POST /api/loops/delete HTTP/1.1" 200 171 "-" "Python-urllib/3.13"
+22:04:56 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:56 +0800] "POST /api/loops/delete HTTP/1.1" 200 171 "-" "Python-urllib/3.13"
+22:04:56 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:56 +0800] "POST /api/loops/delete HTTP/1.1" 200 171 "-" "Python-urllib/3.13"
+22:04:56 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:56 +0800] "POST /api/loops/close HTTP/1.1" 200 171 "-" "Python-urllib/3.13"
+22:04:56 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:56 +0800] "POST /api/loops/close HTTP/1.1" 200 171 "-" "Python-urllib/3.13"
+22:04:56 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:56 +0800] "POST /api/loops/delete HTTP/1.1" 200 171 "-" "Python-urllib/3.13"
+22:04:56 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:56 +0800] "POST /api/loops/delete HTTP/1.1" 200 171 "-" "Python-urllib/3.13"
+22:04:56 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:56 +0800] "POST /api/loops/close HTTP/1.1" 200 171 "-" "Python-urllib/3.13"
+22:04:56 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:56 +0800] "POST /api/loops/delete HTTP/1.1" 200 171 "-" "Python-urllib/3.13"
+22:04:56 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:56 +0800] "POST /api/loops/close HTTP/1.1" 200 171 "-" "Python-urllib/3.13"
+22:04:56 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:56 +0800] "POST /api/catchup HTTP/1.1" 200 175 "-" "Python-urllib/3.13"
+22:04:56 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:56 +0800] "POST /api/catchup HTTP/1.1" 200 175 "-" "Python-urllib/3.13"
+22:04:56 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:56 +0800] "POST /api/catchup HTTP/1.1" 200 175 "-" "Python-urllib/3.13"
+22:04:56 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:56 +0800] "POST /api/catchup HTTP/1.1" 200 175 "-" "Python-urllib/3.13"
+22:04:56 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:56 +0800] "POST /api/catchup HTTP/1.1" 200 175 "-" "Python-urllib/3.13"
+22:04:56 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:56 +0800] "POST /api/catchup HTTP/1.1" 200 175 "-" "Python-urllib/3.13"
+22:04:57 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:57 +0800] "GET /api/llms HTTP/1.1" 200 693 "-" "Python-urllib/3.13"
+22:04:57 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:57 +0800] "POST /new_chat HTTP/1.1" 200 198 "-" "Python-urllib/3.13"
+22:04:58 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:57 +0800] "POST /new_chat HTTP/1.1" 200 198 "-" "Python-urllib/3.13"
+22:04:58 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:58 +0800] "POST /switch_chat HTTP/1.1" 200 234 "-" "Python-urllib/3.13"
+22:04:58 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:58 +0800] "POST /switch_chat HTTP/1.1" 200 231 "-" "Python-urllib/3.13"
+22:04:58 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:58 +0800] "POST /switch_chat HTTP/1.1" 200 234 "-" "Python-urllib/3.13"
+22:04:58 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:58 +0800] "POST /api/session_model HTTP/1.1" 200 189 "-" "Python-urllib/3.13"
+22:04:58 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:58 +0800] "POST /api/session_model HTTP/1.1" 200 192 "-" "Python-urllib/3.13"
+22:04:58 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:58 +0800] "POST /switch_chat HTTP/1.1" 200 231 "-" "Python-urllib/3.13"
+22:04:59 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:59 +0800] "GET /history HTTP/1.1" 200 204 "-" "Python-urllib/3.13"
+22:04:59 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:59 +0800] "POST /new_chat HTTP/1.1" 200 198 "-" "Python-urllib/3.13"
+22:04:59 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:59 +0800] "POST /switch_chat HTTP/1.1" 200 226 "-" "Python-urllib/3.13"
+22:04:59 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:59 +0800] "POST /switch_chat HTTP/1.1" 200 231 "-" "Python-urllib/3.13"
+22:04:59 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:04:59 +0800] "POST /api/session_model HTTP/1.1" 200 185 "-" "Python-urllib/3.13"
+22:05:00 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:05:00 +0800] "POST /api/session_model HTTP/1.1" 200 185 "-" "Python-urllib/3.13"
+22:05:30 [chat] INFO: 收到聊天请求: text=刚洗完澡，头发还在滴水..., mode=deepseek, length_mode=long
+======== Running on http://127.0.0.1:8877 ========
+(Press CTRL+C to quit)
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 71.32it/s]
+22:05:32 [aiohttp.server] ERROR: Error handling request from 127.0.0.1
+Traceback (most recent call last):
+  File "E:\teams\world-companion\.venv\Lib\site-packages\aiohttp\web_protocol.py", line 575, in _handle_request
+    resp = await request_handler(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\teams\world-companion\.venv\Lib\site-packages\aiohttp\web_app.py", line 559, in _handle
+    return await handler(request)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\teams\world-companion\.venv\Lib\site-packages\aiohttp\web_middlewares.py", line 117, in impl
+    return await handler(request)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\teams\world-companion\app.py", line 151, in no_cache_frontend
+    resp = await handler(request)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\teams\world-companion\routes\chat.py", line 698, in chat_handler
+    db.save_message(session_id, "user", text)
+  File "E:\teams\world-companion\db.py", line 378, in save_message
+    conn.execute(f"INSERT INTO [{table_name}] (role, content, timestamp) VALUES (?, ?, ?)",
+sqlite3.OperationalError: no such table: messages_session_smoke2_3e07ba
+22:06:03 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:06:03 +0800] "GET /api/sessions HTTP/1.1" 200 292 "-" "Python-urllib/3.11"
+22:06:03 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:06:03 +0800] "GET /api/sessions HTTP/1.1" 200 292 "-" "Python-urllib/3.11"
+22:07:17 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:07:17 +0800] "GET /api/personas/active HTTP/1.1" 200 247 "-" "curl/8.21.0"
+22:07:57 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:07:57 +0800] "GET / HTTP/1.1" 200 11264 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) WorkBuddy/5.8.3 Chrome/138.0.7204.251 Electron/37.10.3 Safari/537.36"
+22:07:58 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:07:58 +0800] "GET /static/css/style.css HTTP/1.1" 200 290 "http://127.0.0.1:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) WorkBuddy/5.8.3 Chrome/138.0.7204.251 Electron/37.10.3 Safari/537.36"
+22:07:58 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:07:58 +0800] "GET /static/js/guide.js HTTP/1.1" 200 304 "http://127.0.0.1:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) WorkBuddy/5.8.3 Chrome/138.0.7204.251 Electron/37.10.3 Safari/537.36"
+22:07:58 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:07:58 +0800] "GET /static/js/utils.js HTTP/1.1" 200 301 "http://127.0.0.1:8877/static/js/guide.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) WorkBuddy/5.8.3 Chrome/138.0.7204.251 Electron/37.10.3 Safari/537.36"
+22:07:58 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:07:58 +0800] "GET /static/js/personas.js HTTP/1.1" 200 304 "http://127.0.0.1:8877/static/js/guide.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) WorkBuddy/5.8.3 Chrome/138.0.7204.251 Electron/37.10.3 Safari/537.36"
+22:07:58 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:07:58 +0800] "GET /api/guide/home HTTP/1.1" 200 3751 "http://127.0.0.1:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) WorkBuddy/5.8.3 Chrome/138.0.7204.251 Electron/37.10.3 Safari/537.36"
+22:07:58 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:07:58 +0800] "GET /api/llms HTTP/1.1" 200 693 "http://127.0.0.1:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) WorkBuddy/5.8.3 Chrome/138.0.7204.251 Electron/37.10.3 Safari/537.36"
+22:07:58 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:07:58 +0800] "GET /api/status HTTP/1.1" 200 240 "http://127.0.0.1:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) WorkBuddy/5.8.3 Chrome/138.0.7204.251 Electron/37.10.3 Safari/537.36"
+22:10:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:10:55 +0800] "POST /new_chat HTTP/1.1" 200 198 "-" "Python-urllib/3.11"
+22:10:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:10:55 +0800] "GET /api/guide/home HTTP/1.1" 200 3891 "-" "Python-urllib/3.11"
+22:10:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:10:55 +0800] "POST /delete_session HTTP/1.1" 200 187 "-" "Python-urllib/3.11"
+22:10:55 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:10:55 +0800] "GET /api/guide/home HTTP/1.1" 200 3751 "-" "Python-urllib/3.11"
+22:11:57 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:11:57 +0800] "GET / HTTP/1.1" 200 11264 "http://localhost:8877/chat?s=session_1792499255246" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:11:57 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:11:57 +0800] "GET /static/js/guide.js HTTP/1.1" 200 304 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:11:57 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:11:57 +0800] "GET /static/css/style.css HTTP/1.1" 200 290 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:11:57 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:11:57 +0800] "GET /static/js/personas.js HTTP/1.1" 200 304 "http://localhost:8877/static/js/guide.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:11:57 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:11:57 +0800] "GET /static/js/utils.js HTTP/1.1" 200 301 "http://localhost:8877/static/js/guide.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:11:57 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:11:57 +0800] "GET /api/guide/home HTTP/1.1" 200 3751 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:11:57 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:11:57 +0800] "GET /api/llms HTTP/1.1" 200 693 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:11:57 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:11:57 +0800] "GET /api/status HTTP/1.1" 200 240 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:11:59 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:11:59 +0800] "GET / HTTP/1.1" 200 11264 "http://localhost:8877/chat?s=session_1792499255246" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:11:59 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:11:59 +0800] "GET /static/js/guide.js HTTP/1.1" 200 304 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:11:59 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:11:59 +0800] "GET /static/css/style.css HTTP/1.1" 200 290 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:11:59 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:11:59 +0800] "GET /static/js/personas.js HTTP/1.1" 200 304 "http://localhost:8877/static/js/guide.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:11:59 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:11:59 +0800] "GET /static/js/utils.js HTTP/1.1" 200 301 "http://localhost:8877/static/js/guide.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:11:59 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:11:59 +0800] "GET /api/guide/home HTTP/1.1" 200 3751 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:11:59 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:11:59 +0800] "GET /api/llms HTTP/1.1" 200 693 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:11:59 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:11:59 +0800] "GET /api/status HTTP/1.1" 200 240 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:12:16 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:12:16 +0800] "GET / HTTP/1.1" 200 11264 "http://localhost:8877/chat?s=session_1792499255246" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:12:16 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:12:16 +0800] "GET /static/js/guide.js HTTP/1.1" 200 304 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:12:16 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:12:16 +0800] "GET /static/js/personas.js HTTP/1.1" 200 304 "http://localhost:8877/static/js/guide.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:12:16 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:12:16 +0800] "GET /static/css/style.css HTTP/1.1" 200 290 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:12:16 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:12:16 +0800] "GET /static/js/utils.js HTTP/1.1" 200 301 "http://localhost:8877/static/js/guide.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:12:16 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:12:16 +0800] "GET /api/guide/home HTTP/1.1" 200 3751 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:12:16 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:12:16 +0800] "GET /api/llms HTTP/1.1" 200 693 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:12:16 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:12:16 +0800] "GET /api/status HTTP/1.1" 200 240 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:12:19 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:12:19 +0800] "GET / HTTP/1.1" 200 11264 "http://localhost:8877/chat?s=session_1792499255246" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:12:19 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:12:19 +0800] "GET /static/css/style.css HTTP/1.1" 200 290 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:12:19 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:12:19 +0800] "GET /static/js/guide.js HTTP/1.1" 200 304 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:12:19 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:12:19 +0800] "GET /static/js/personas.js HTTP/1.1" 200 304 "http://localhost:8877/static/js/guide.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:12:19 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:12:19 +0800] "GET /static/js/utils.js HTTP/1.1" 200 301 "http://localhost:8877/static/js/guide.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:12:19 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:12:19 +0800] "GET /api/guide/home HTTP/1.1" 200 3751 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:12:19 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:12:19 +0800] "GET /api/llms HTTP/1.1" 200 693 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:12:19 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:12:19 +0800] "GET /api/status HTTP/1.1" 200 240 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:12:19 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:12:19 +0800] "GET /favicon.ico HTTP/1.1" 404 174 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:13:38 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:13:38 +0800] "POST /api/guide/enter HTTP/1.1" 200 210 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:13:38 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:13:38 +0800] "GET /chat?s=session_1792505618910 HTTP/1.1" 200 20717 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:13:39 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:13:38 +0800] "GET /static/css/style.css HTTP/1.1" 200 290 "http://localhost:8877/chat?s=session_1792505618910" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:13:39 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:13:38 +0800] "GET /static/js/app.js HTTP/1.1" 200 303 "http://localhost:8877/chat?s=session_1792505618910" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:13:39 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:13:39 +0800] "GET /static/js/state.js HTTP/1.1" 200 301 "http://localhost:8877/static/js/app.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:13:39 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:13:39 +0800] "GET /static/js/chat.js HTTP/1.1" 200 304 "http://localhost:8877/static/js/app.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:13:39 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:13:39 +0800] "GET /static/js/tts.js HTTP/1.1" 200 303 "http://localhost:8877/static/js/app.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:13:39 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:13:39 +0800] "GET /static/js/sessions.js HTTP/1.1" 200 303 "http://localhost:8877/static/js/app.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:13:39 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:13:39 +0800] "GET /static/js/memory.js HTTP/1.1" 200 304 "http://localhost:8877/static/js/app.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:13:39 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:13:39 +0800] "GET /static/js/loops.js HTTP/1.1" 200 303 "http://localhost:8877/static/js/app.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:13:39 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:13:39 +0800] "GET /static/js/personas.js HTTP/1.1" 200 304 "http://localhost:8877/static/js/app.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:13:39 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:13:39 +0800] "GET /static/js/ui.js HTTP/1.1" 200 302 "http://localhost:8877/static/js/app.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:13:39 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:13:39 +0800] "GET /static/js/utils.js HTTP/1.1" 200 301 "http://localhost:8877/static/js/chat.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:13:39 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:13:39 +0800] "GET /chat_sessions HTTP/1.1" 200 460 "http://localhost:8877/chat?s=session_1792505618910" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:13:39 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:13:39 +0800] "GET /api/llms HTTP/1.1" 200 693 "http://localhost:8877/chat?s=session_1792505618910" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:13:39 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:13:39 +0800] "GET /history?session_id=session_1792505618910&limit=200 HTTP/1.1" 200 207 "http://localhost:8877/chat?s=session_1792505618910" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:13:39 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:13:39 +0800] "GET /api/status?session_id=session_1792505618910 HTTP/1.1" 200 444 "http://localhost:8877/chat?s=session_1792505618910" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:13:39 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:13:39 +0800] "POST /api/catchup HTTP/1.1" 200 175 "http://localhost:8877/chat?s=session_1792505618910" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:13:39 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:13:39 +0800] "GET /api/status?session_id=session_1792505618910 HTTP/1.1" 200 444 "http://localhost:8877/chat?s=session_1792505618910" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:13:41 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:13:41 +0800] "GET / HTTP/1.1" 200 11264 "http://localhost:8877/chat?s=session_1792505618910" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:13:41 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:13:41 +0800] "GET /static/css/style.css HTTP/1.1" 200 290 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:13:41 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:13:41 +0800] "GET /static/js/guide.js HTTP/1.1" 200 304 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:13:42 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:13:42 +0800] "GET /static/js/personas.js HTTP/1.1" 200 304 "http://localhost:8877/static/js/guide.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:13:42 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:13:42 +0800] "GET /static/js/utils.js HTTP/1.1" 200 301 "http://localhost:8877/static/js/guide.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:13:42 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:13:42 +0800] "GET /api/guide/home HTTP/1.1" 200 3898 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:13:42 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:13:42 +0800] "GET /api/llms HTTP/1.1" 200 693 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:13:42 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:13:42 +0800] "GET /api/status HTTP/1.1" 200 240 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:14:25 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:14:25 +0800] "GET /static/js/guide.js HTTP/1.1" 200 304 "-" "curl/8.21.0"
+22:15:42 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:15:42 +0800] "GET / HTTP/1.1" 200 11264 "http://localhost:8877/chat?s=session_1792505618910" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:15:42 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:15:42 +0800] "GET /static/js/guide.js HTTP/1.1" 200 304 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:15:42 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:15:42 +0800] "GET /static/css/style.css HTTP/1.1" 200 290 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:15:42 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:15:42 +0800] "GET /static/js/personas.js HTTP/1.1" 200 304 "http://localhost:8877/static/js/guide.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:15:42 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:15:42 +0800] "GET /static/js/utils.js HTTP/1.1" 200 301 "http://localhost:8877/static/js/guide.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:15:42 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:15:42 +0800] "GET /api/guide/home HTTP/1.1" 200 3898 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:15:42 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:15:42 +0800] "GET /api/llms HTTP/1.1" 200 693 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:15:42 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:15:42 +0800] "GET /api/status HTTP/1.1" 200 240 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:15:43 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:15:43 +0800] "GET / HTTP/1.1" 200 11264 "http://localhost:8877/chat?s=session_1792505618910" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:15:43 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:15:43 +0800] "GET /static/js/guide.js HTTP/1.1" 200 304 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:15:43 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:15:43 +0800] "GET /static/css/style.css HTTP/1.1" 200 290 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:15:43 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:15:43 +0800] "GET /static/js/personas.js HTTP/1.1" 200 304 "http://localhost:8877/static/js/guide.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:15:43 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:15:43 +0800] "GET /static/js/utils.js HTTP/1.1" 200 301 "http://localhost:8877/static/js/guide.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:15:43 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:15:43 +0800] "GET /api/guide/home HTTP/1.1" 200 3898 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:15:43 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:15:43 +0800] "GET /api/llms HTTP/1.1" 200 693 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:15:43 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:15:43 +0800] "GET /api/status HTTP/1.1" 200 240 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:15:47 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:15:47 +0800] "GET / HTTP/1.1" 200 11264 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:15:47 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:15:47 +0800] "GET /static/css/style.css HTTP/1.1" 200 290 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:15:47 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:15:47 +0800] "GET /static/js/guide.js HTTP/1.1" 200 304 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:15:48 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:15:48 +0800] "GET /static/js/utils.js HTTP/1.1" 200 301 "http://localhost:8877/static/js/guide.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:15:48 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:15:48 +0800] "GET /static/js/personas.js HTTP/1.1" 200 304 "http://localhost:8877/static/js/guide.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:15:48 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:15:48 +0800] "GET /api/guide/home HTTP/1.1" 200 3898 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:15:48 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:15:48 +0800] "GET /api/llms HTTP/1.1" 200 693 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:15:48 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:15:48 +0800] "GET /api/status HTTP/1.1" 200 240 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:15:58 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:15:58 +0800] "POST /delete_session HTTP/1.1" 200 187 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:15:58 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:15:58 +0800] "GET /api/guide/home HTTP/1.1" 200 3765 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:15:58 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:15:58 +0800] "GET /api/llms HTTP/1.1" 200 693 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:15:58 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:15:58 +0800] "GET /api/status HTTP/1.1" 200 240 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:16:00 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:16:00 +0800] "POST /api/guide/enter HTTP/1.1" 200 210 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:16:00 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:16:00 +0800] "GET /chat?s=session_1792505618910 HTTP/1.1" 200 20717 "http://localhost:8877/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:16:00 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:16:00 +0800] "GET /static/css/style.css HTTP/1.1" 200 290 "http://localhost:8877/chat?s=session_1792505618910" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:16:00 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:16:00 +0800] "GET /static/js/app.js HTTP/1.1" 200 303 "http://localhost:8877/chat?s=session_1792505618910" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:16:00 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:16:00 +0800] "GET /static/js/state.js HTTP/1.1" 200 301 "http://localhost:8877/static/js/app.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:16:00 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:16:00 +0800] "GET /static/js/tts.js HTTP/1.1" 200 303 "http://localhost:8877/static/js/app.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:16:00 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:16:00 +0800] "GET /static/js/sessions.js HTTP/1.1" 200 303 "http://localhost:8877/static/js/app.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:16:00 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:16:00 +0800] "GET /static/js/memory.js HTTP/1.1" 200 304 "http://localhost:8877/static/js/app.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:16:00 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:16:00 +0800] "GET /static/js/loops.js HTTP/1.1" 200 303 "http://localhost:8877/static/js/app.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:16:00 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:16:00 +0800] "GET /static/js/chat.js HTTP/1.1" 200 304 "http://localhost:8877/static/js/app.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:16:00 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:16:00 +0800] "GET /static/js/ui.js HTTP/1.1" 200 302 "http://localhost:8877/static/js/app.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:16:00 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:16:00 +0800] "GET /static/js/utils.js HTTP/1.1" 200 301 "http://localhost:8877/static/js/sessions.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:16:00 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:16:00 +0800] "GET /static/js/personas.js HTTP/1.1" 200 304 "http://localhost:8877/static/js/app.js" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:16:00 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:16:00 +0800] "GET /chat_sessions HTTP/1.1" 200 342 "http://localhost:8877/chat?s=session_1792505618910" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:16:00 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:16:00 +0800] "GET /api/llms HTTP/1.1" 200 693 "http://localhost:8877/chat?s=session_1792505618910" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:16:00 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:16:00 +0800] "GET /history?session_id=session_1792505618910&limit=200 HTTP/1.1" 200 207 "http://localhost:8877/chat?s=session_1792505618910" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:16:00 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:16:00 +0800] "GET /api/status?session_id=session_1792505618910 HTTP/1.1" 200 444 "http://localhost:8877/chat?s=session_1792505618910" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:16:00 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:16:00 +0800] "POST /api/catchup HTTP/1.1" 200 175 "http://localhost:8877/chat?s=session_1792505618910" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:16:01 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:16:01 +0800] "GET /api/status?session_id=session_1792505618910 HTTP/1.1" 200 444 "http://localhost:8877/chat?s=session_1792505618910" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:21:00 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:21:00 +0800] "POST /api/catchup HTTP/1.1" 200 175 "http://localhost:8877/chat?s=session_1792505618910" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:26:00 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:26:00 +0800] "POST /api/catchup HTTP/1.1" 200 175 "http://localhost:8877/chat?s=session_1792505618910" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:31:00 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:31:00 +0800] "POST /api/catchup HTTP/1.1" 200 175 "http://localhost:8877/chat?s=session_1792505618910" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:31:38 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:31:38 +0800] "POST /api/catchup HTTP/1.1" 200 175 "http://localhost:8877/chat?s=session_1792505618910" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+22:47:01 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:47:01 +0800] "GET /api/personas/prs_xiaxue HTTP/1.1" 200 13751 "-" "Python-urllib/3.11"
+22:47:01 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:47:01 +0800] "POST /api/personas/prs_xiaxue HTTP/1.1" 200 16692 "-" "Python-urllib/3.11"
+22:47:01 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:47:01 +0800] "GET /api/personas/prs_xiaxue HTTP/1.1" 200 16660 "-" "Python-urllib/3.11"
+22:47:11 [chat] INFO: 收到聊天请求: text=外面下雨了..., mode=deepseek, length_mode=long
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 26.96it/s]
+22:47:14 [aiohttp.server] ERROR: Error handling request from 127.0.0.1
+Traceback (most recent call last):
+  File "E:\teams\world-companion\.venv\Lib\site-packages\aiohttp\web_protocol.py", line 575, in _handle_request
+    resp = await request_handler(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\teams\world-companion\.venv\Lib\site-packages\aiohttp\web_app.py", line 559, in _handle
+    return await handler(request)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\teams\world-companion\.venv\Lib\site-packages\aiohttp\web_middlewares.py", line 117, in impl
+    return await handler(request)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\teams\world-companion\app.py", line 151, in no_cache_frontend
+    resp = await handler(request)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\teams\world-companion\routes\chat.py", line 698, in chat_handler
+    db.save_message(session_id, "user", text)
+  File "E:\teams\world-companion\db.py", line 378, in save_message
+    conn.execute(f"INSERT INTO [{table_name}] (role, content, timestamp) VALUES (?, ?, ?)",
+sqlite3.OperationalError: no such table: messages_session_style_1792507631920_b7dc
+22:47:14 [chat] INFO: 收到聊天请求: text=今晚吃火锅吧..., mode=deepseek, length_mode=long
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 55.44it/s]
+22:47:16 [aiohttp.server] ERROR: Error handling request from 127.0.0.1
+Traceback (most recent call last):
+  File "E:\teams\world-companion\.venv\Lib\site-packages\aiohttp\web_protocol.py", line 575, in _handle_request
+    resp = await request_handler(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\teams\world-companion\.venv\Lib\site-packages\aiohttp\web_app.py", line 559, in _handle
+    return await handler(request)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\teams\world-companion\.venv\Lib\site-packages\aiohttp\web_middlewares.py", line 117, in impl
+    return await handler(request)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\teams\world-companion\app.py", line 151, in no_cache_frontend
+    resp = await handler(request)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\teams\world-companion\routes\chat.py", line 698, in chat_handler
+    db.save_message(session_id, "user", text)
+  File "E:\teams\world-companion\db.py", line 378, in save_message
+    conn.execute(f"INSERT INTO [{table_name}] (role, content, timestamp) VALUES (?, ?, ?)",
+sqlite3.OperationalError: no such table: messages_session_style_1792507634101_21a7
+22:47:16 [chat] INFO: 收到聊天请求: text=今天好困..., mode=deepseek, length_mode=long
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 95.03it/s]
+22:47:18 [aiohttp.server] ERROR: Error handling request from 127.0.0.1
+Traceback (most recent call last):
+  File "E:\teams\world-companion\.venv\Lib\site-packages\aiohttp\web_protocol.py", line 575, in _handle_request
+    resp = await request_handler(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\teams\world-companion\.venv\Lib\site-packages\aiohttp\web_app.py", line 559, in _handle
+    return await handler(request)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\teams\world-companion\.venv\Lib\site-packages\aiohttp\web_middlewares.py", line 117, in impl
+    return await handler(request)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\teams\world-companion\app.py", line 151, in no_cache_frontend
+    resp = await handler(request)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\teams\world-companion\routes\chat.py", line 698, in chat_handler
+    db.save_message(session_id, "user", text)
+  File "E:\teams\world-companion\db.py", line 378, in save_message
+    conn.execute(f"INSERT INTO [{table_name}] (role, content, timestamp) VALUES (?, ?, ?)",
+sqlite3.OperationalError: no such table: messages_session_style_1792507636223_00fa
+22:47:33 [chat] INFO: 收到聊天请求: text=我回来了..., mode=deepseek, length_mode=long
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 105.06it/s]
+22:47:35 [aiohttp.server] ERROR: Error handling request from 127.0.0.1
+Traceback (most recent call last):
+  File "E:\teams\world-companion\.venv\Lib\site-packages\aiohttp\web_protocol.py", line 575, in _handle_request
+    resp = await request_handler(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\teams\world-companion\.venv\Lib\site-packages\aiohttp\web_app.py", line 559, in _handle
+    return await handler(request)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\teams\world-companion\.venv\Lib\site-packages\aiohttp\web_middlewares.py", line 117, in impl
+    return await handler(request)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\teams\world-companion\app.py", line 151, in no_cache_frontend
+    resp = await handler(request)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\teams\world-companion\routes\chat.py", line 698, in chat_handler
+    db.save_message(session_id, "user", text)
+  File "E:\teams\world-companion\db.py", line 378, in save_message
+    conn.execute(f"INSERT INTO [{table_name}] (role, content, timestamp) VALUES (?, ?, ?)",
+sqlite3.OperationalError: no such table: messages_session_style2_1792507653835_02b9
+22:47:35 [chat] INFO: 收到聊天请求: text=帮我想想周末去哪玩..., mode=deepseek, length_mode=long
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 66.52it/s]
+22:47:38 [aiohttp.server] ERROR: Error handling request from 127.0.0.1
+Traceback (most recent call last):
+  File "E:\teams\world-companion\.venv\Lib\site-packages\aiohttp\web_protocol.py", line 575, in _handle_request
+    resp = await request_handler(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\teams\world-companion\.venv\Lib\site-packages\aiohttp\web_app.py", line 559, in _handle
+    return await handler(request)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\teams\world-companion\.venv\Lib\site-packages\aiohttp\web_middlewares.py", line 117, in impl
+    return await handler(request)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\teams\world-companion\app.py", line 151, in no_cache_frontend
+    resp = await handler(request)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\teams\world-companion\routes\chat.py", line 698, in chat_handler
+    db.save_message(session_id, "user", text)
+  File "E:\teams\world-companion\db.py", line 378, in save_message
+    conn.execute(f"INSERT INTO [{table_name}] (role, content, timestamp) VALUES (?, ?, ?)",
+sqlite3.OperationalError: no such table: messages_session_style2_1792507655686_d513
+22:47:50 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:47:50 +0800] "GET /api/sessions HTTP/1.1" 200 306 "-" "Python-urllib/3.11"
+22:47:50 [aiohttp.access] INFO: 127.0.0.1 [20/Oct/2026:22:47:50 +0800] "GET /api/sessions HTTP/1.1" 200 306 "-" "Python-urllib/3.11"

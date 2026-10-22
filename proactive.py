@@ -20,6 +20,7 @@ import re
 from datetime import datetime, timedelta
 
 import db
+from prompts import get_prompt
 
 logger = logging.getLogger("proactive")
 
@@ -46,8 +47,20 @@ def _human(hours):
     return f"{days} 天" + (f" {rest} 小时" if rest else "")
 
 
-def _persona_brief():
-    """从 persona_anchor.json 取一小段人设，供生成时参考"""
+def _persona_brief(session_id=None):
+    """取一小段人设，供主动发消息时参考。优先走人格库，库空回退旧 JSON 文件。
+
+    v0.17.5：传 session_id 时取该会话所属世界的角色（世界隔离——
+    A 世界的会话离开时，留言必须是 A 世界的她发的，不能拿全局主角顶替）。
+    """
+    try:
+        import persona_store
+        pa = persona_store.active_persona(session_id)
+        if pa:
+            return persona_store.persona_brief(pa)
+    except Exception:
+        pass
+    # 库不可用 → 文件兜底
     try:
         import config
         path = os.path.join(config.BASE_DIR, "persona_anchor.json")
@@ -69,24 +82,26 @@ def _persona_brief():
         return ""
 
 
+# v0.16.0：文案搬进 prompts/tasks.json（tasks.proactive_message / tasks.proactive_system），
+# 此常量仅作 default 兜底。改文案请改 prompts/tasks.json，改完秒生效，不用重启。
 _PROMPT = """你是一个角色扮演的辅助写手。请写出「她」在这段时间里主动发给对方的消息。
 
 ## 时间背景
-- 现实里，对方已经 **{away_desc}** 没出现了
-- 但剧情里，她那边只过了 **{story_desc}**（所以不要写成"好几天没见"）
+- 现实里，对方已经 **{{AWAY_DESC}}** 没出现了
+- 但剧情里，她那边只过了 **{{STORY_DESC}}**（所以不要写成"好几天没见"）
 
 ## 她现在的状态
-- 她在哪：{place}
-- 她在做什么：{her_doing}
+- 她在哪：{{PLACE}}
+- 她在做什么：{{HER_DOING}}
 
 ## 她惦记的事（最多一条消息提到，不要条条都在催）
-{loops}
+{{LOOPS}}
 
 ## 人设参考
-{persona}
+{{PERSONA}}
 
 ## 要求
-- 写 **{n}** 条她**单方面**发给他的消息（他一直没有回复）
+- 写 **{{N}}** 条她**单方面**发给他的消息（他一直没有回复）
 - 每条 1-2 句，像微信留言，短
 - **要能感觉到时间在流动**：第一条是刚分开不久，最后一条是最近
 - 内容可以是：想他、分享自己在做什么、问他怎么样了、提到惦记的事
@@ -96,7 +111,7 @@ _PROMPT = """你是一个角色扮演的辅助写手。请写出「她」在这�
 
 ## 输出
 只输出 JSON 数组，不要任何解释文字：
-[{{"content": "消息内容", "minutes_after": 从分开算起的分钟数}}]
+[{"content": "消息内容", "minutes_after": 从分开算起的分钟数}]
 """
 
 _SYSTEM = "你是一个角色扮演辅助写手。只输出要求的 JSON 数组，不要任何解释。"
@@ -113,12 +128,12 @@ def make_llm_call(preferred_mode="deepseek"):
     def _call(messages):
         payload = messages[-1]["content"]
         text = _llm.chat(payload, mode=preferred_mode,
-                         system_prompt=_SYSTEM, history=[])
+                         system_prompt=get_prompt("tasks.proactive_system", default=_SYSTEM), history=[])
         if _is_error(text):
             fallback = "deepseek" if preferred_mode != "deepseek" else "agnes"
             if fallback != preferred_mode:
                 logger.warning("留言生成模型 %s 不可用，回退到 %s", preferred_mode, fallback)
-                text = _llm.chat(payload, mode=fallback, system_prompt=_SYSTEM, history=[])
+                text = _llm.chat(payload, mode=fallback, system_prompt=get_prompt("tasks.proactive_system", default=_SYSTEM), history=[])
         return text
 
     return _call
@@ -169,14 +184,15 @@ def maybe_generate(session_id, llm_call):
         loops_text = "\n".join(f"- {x['content']}" for x in pending[:3]) or "- （没有特别惦记的事）"
 
         n = _how_many(away_hours)
-        prompt = _PROMPT.format(
-            away_desc=_human(away_hours),
-            story_desc=_human(story_hours),
-            place=sc.get("place") or "家",
-            her_doing=sc.get("her_doing") or "一个人待着",
-            loops=loops_text,
-            persona=_persona_brief() or "温柔、粘人的女朋友",
-            n=n,
+        prompt = get_prompt(
+            "tasks.proactive_message", default=_PROMPT,
+            AWAY_DESC=_human(away_hours),
+            STORY_DESC=_human(story_hours),
+            PLACE=sc.get("place") or "家",
+            HER_DOING=sc.get("her_doing") or "一个人待着",
+            LOOPS=loops_text,
+            PERSONA=_persona_brief(session_id) or "温柔、粘人的女朋友",
+            N=n,
         )
 
         raw = llm_call([{"role": "user", "content": prompt}])

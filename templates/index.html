@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>World Companion - 夏雪</title>
+    <title>World Companion - 聊天</title>
     <link rel="stylesheet" href="/static/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
@@ -13,7 +13,10 @@
         <aside class="sidebar">
             <div class="sidebar-header">
                 <h2>World Companion</h2>
-                <button class="btn-new-chat" onclick="newChat()">+ 新对话</button>
+                <div class="sidebar-head-btns">
+                    <button class="btn-home" onclick="goGuide()" title="回到引导页">🏠 引导页</button>
+                    <button class="btn-new-chat" onclick="newChat()">+ 新对话</button>
+                </div>
             </div>
             <div class="session-list" id="sessionList">
                 <!-- 会话列表 -->
@@ -33,9 +36,9 @@
                      改名挪到左栏每个会话项上（hover 显示）。 -->
                 <div class="chat-actions">
                     <div class="length-mode" id="lengthModeGroup">
-                        <button class="length-btn active" data-mode="normal" onclick="setLengthMode('normal')" title="标准回复">标准</button>
+                        <button class="length-btn" data-mode="normal" onclick="setLengthMode('normal')" title="标准回复">标准</button>
                         <button class="length-btn" data-mode="short" onclick="setLengthMode('short')" title="简短回复">短</button>
-                        <button class="length-btn" data-mode="long" onclick="setLengthMode('long')" title="详细回复">详</button>
+                        <button class="length-btn active" data-mode="long" onclick="setLengthMode('long')" title="详细回复">详</button>
                         <span id="lengthModeHint" style="display:none; color: var(--text-secondary); font-size: 12px; margin-left: 5px;"></span>
                     </div>
                     <button id="groupModeBtn" class="btn-tts" onclick="toggleGroupMode()" title="群像模式：人物表里的角色可以同场出场说话">🎭</button>
@@ -52,6 +55,8 @@
                             </div>
                             <button id="autoBtn" class="btn-auto" onclick="toggleAutoChat()">🔄 自动语音聊天</button>
                             <button onclick="openPromptModal()">✏️ 编辑人设</button>
+                            <button onclick="switchTab('personas')">🎭 角色与模板</button>
+                            <button onclick="openOnboarding()">🎨 引导建对话</button>
                             <button onclick="openLoopsModal()">⏳ 管理承诺</button>
                             <button onclick="openPersonConfigModal()">👨‍👩‍👧 人物配置导入导出</button>
                             <button onclick="openSearchModal()">🔍 搜索记录</button>
@@ -87,11 +92,13 @@
             <button class="tab-btn active" onclick="switchTab('memory')">记忆</button>
             <button class="tab-btn" onclick="switchTab('people')">人物</button>
             <button class="tab-btn" onclick="switchTab('relations')">关系</button>
+            <button class="tab-btn" onclick="switchTab('personas')">角色</button>
         </div>
         <div class="panel-content">
             <div id="memoryPanel" class="tab-panel active"></div>
             <div id="peoplePanel" class="tab-panel"></div>
             <div id="relationsPanel" class="tab-panel"></div>
+            <div id="personasPanel" class="tab-panel"></div>
         </div>
     </aside>
     </div>
@@ -233,6 +240,116 @@
                     <button class="btn" onclick="closePersonConfigModal()">关闭</button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- ============ 角色引导弹窗（对话式）============ -->
+    <div class="modal" id="onboardingModal" style="display: none;">
+        <div class="modal-content" style="width: 560px;">
+            <div class="modal-header">
+                <h3>🎨 引导建对话</h3>
+                <button class="modal-close" onclick="onboardingAbort()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="prompt-hint">跟 AI 一句句聊，它一次问一件事，把这个世界、你自己、主要人物、你们的关系一步步定清楚。中途走开没关系，下次进来接着聊。</p>
+                <div id="obTplBanner" class="tpl-preset-banner" style="display: none;"></div>
+                <div id="onboardingLog" class="ob-log"></div>
+                <div id="onboardingFinishBar" class="ob-finish-bar" style="display: none;">
+                    <span class="ob-finish-label">确认就建好：</span>
+                    <label class="ob-check"><input type="checkbox" id="obSaveTemplate"> 同时把世界设定存成模板</label>
+                    <button class="btn btn-primary btn-sm" onclick="onboardingFinish(document.getElementById('obSaveTemplate').checked)">确认建好</button>
+                </div>
+                <div class="ob-input-row">
+                    <input id="onboardingInput" class="input" placeholder="回答它的问题，或说「预览」看整理好的设定" onkeydown="if(event.key==='Enter') onboardingSend()">
+                    <button id="onboardingSendBtn" class="btn btn-primary btn-sm" onclick="onboardingSend()">发送</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ 快速建对话（一句话）============ -->
+    <div class="modal" id="quickCreateModal" style="display: none;">
+        <div class="modal-content" style="width: 520px;">
+            <div class="modal-header">
+                <h3>⚡ 快速建对话</h3>
+                <button class="modal-close" onclick="closeAllModals()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="prompt-hint">只给一句话，AI 会读完全部上下文（世界模板、已有角色、称呼关系）自己推导出完整人设，并直接落成一个能聊的对话。</p>
+                <div id="quickTplBanner" class="tpl-preset-banner" style="display: none;"></div>
+                <div class="form-group">
+                    <label class="form-label">主要人物叫什么</label>
+                    <input id="quickNameInput" class="input" placeholder="例如：夏琳">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">一句话描述</label>
+                    <textarea id="quickSummaryInput" class="prompt-textarea" rows="3" placeholder="例如：夏雪的妹妹，读大学的，有点闷骚"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">世界设定</label>
+                    <select id="quickTplSelect" class="input"></select>
+                </div>
+                <div class="form-actions">
+                    <button class="btn" onclick="closeAllModals()">取消</button>
+                    <button id="quickCreateBtn" class="btn btn-primary" onclick="quickCreateSubmit()">生成</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ 世界模板编辑 ============ -->
+    <div class="modal" id="tplFormModal" style="display: none;">
+        <div class="modal-content" style="width: 560px; max-height: 86vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h3 id="tplFormTitle">新建世界模板</h3>
+                <button class="modal-close" onclick="closeAllModals()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input id="tplIdInput" type="hidden">
+                <div class="form-group">
+                    <label class="form-label">模板名</label>
+                    <input id="tplNameInput" class="input" placeholder="例如：现代都市·两家亲戚">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">题材</label>
+                    <input id="tplGenreInput" class="input" placeholder="现代都市 / 古代 / 架空修真...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">时代与地点</label>
+                    <input id="tplEraInput" class="input" placeholder="具体到能影响说话方式">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">一句话概述</label>
+                    <input id="tplSummaryInput" class="input" placeholder="这个世界大致是什么样">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">主要圈层<span class="hint">一行一条</span></label>
+                    <textarea id="tplFactionsInput" class="prompt-textarea" rows="4" placeholder="夏家（女方）：夏海、沈青、夏雪、夏琳&#10;同事圈与邻里圈：日常寒暄、串门"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">日常惯例<span class="hint">影响称呼与说话方式</span></label>
+                    <textarea id="tplCustomsInput" class="prompt-textarea" rows="3" placeholder="亲戚之间称呼按辈分：爸、妈、姐、哥&#10;不确定辈分时直接叫名字"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">内容边界<span class="hint">能聊什么，不碰什么</span></label>
+                    <textarea id="tplBoundariesInput" class="prompt-textarea" rows="2" placeholder="话题围绕家庭关系、日常生活&#10;辈分称呼必须准确"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button class="btn" onclick="closeAllModals()">取消</button>
+                    <button class="btn btn-primary" onclick="saveTemplateForm()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ 角色详情 ============ -->
+    <div class="modal" id="personaDetailModal" style="display: none;">
+        <div class="modal-content" style="width: 620px; max-height: 86vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h3 id="personaDetailName">角色详情</h3>
+                <button class="modal-close" onclick="closeAllModals()">&times;</button>
+            </div>
+            <div class="modal-body" id="personaDetailBody"></div>
         </div>
     </div>
 

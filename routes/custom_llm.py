@@ -8,6 +8,20 @@ from aiohttp import web
 CONFIG_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "llm_config.json")
 
 
+def _mask_key(key):
+    """API Key 脱敏：只留前6后4，中间打码。空 key 返回空串。"""
+    if not key:
+        return ""
+    if len(key) <= 10:
+        return key[:2] + "***" + key[-2:]
+    return key[:6] + "***" + key[-4:]
+
+
+def _is_masked(key):
+    """判断是否是脱敏值（防止前端把打码值原样存回配置）"""
+    return bool(key) and "***" in key
+
+
 def load_llm_config():
     """加载 LLM 配置"""
     if os.path.exists(CONFIG_PATH):
@@ -23,9 +37,15 @@ def save_llm_config(data):
 
 
 async def list_llms(request):
-    """获取所有 LLM 配置"""
+    """获取所有 LLM 配置（api_key 脱敏返回，防同网设备窃取）"""
     data = load_llm_config()
-    return web.json_response(data)
+    safe = {"llms": []}
+    for m in data.get("llms", []):
+        m2 = dict(m)
+        m2["has_key"] = bool(m.get("api_key"))
+        m2["api_key"] = _mask_key(m.get("api_key", ""))
+        safe["llms"].append(m2)
+    return web.json_response(safe)
 
 
 async def add_llm(request):
@@ -81,7 +101,8 @@ async def update_llm(request):
                 m["name"] = body["name"]
             if "base_url" in body:
                 m["base_url"] = body["base_url"]
-            if "api_key" in body:
+            if "api_key" in body and not _is_masked(body["api_key"]):
+                # 含 *** 的是脱敏回显值，说明用户没改 key，保持原值
                 m["api_key"] = body["api_key"]
             if "model" in body:
                 m["model"] = body["model"]

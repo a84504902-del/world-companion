@@ -153,6 +153,13 @@ def init_db():
     except Exception:
         conn.execute("ALTER TABLE sessions ADD COLUMN model TEXT")
 
+    # 迁移：角色的世界归属（v0.17.4）——每个世界模板/话题是独立单位，
+    # 角色跟着世界走；同一个世界内重名才拦，跨世界同名互不干扰。
+    try:
+        conn.execute("SELECT world_scope FROM personas LIMIT 1")
+    except Exception:
+        conn.execute("ALTER TABLE personas ADD COLUMN world_scope TEXT DEFAULT ''")
+
     # 向量嵌入表
     c.execute("""CREATE TABLE IF NOT EXISTS memory_embeddings (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -255,6 +262,88 @@ def init_db():
         created_at TEXT DEFAULT (datetime('now', 'localtime'))
     )""")
     c.execute("CREATE INDEX IF NOT EXISTS idx_proposals_sid ON character_proposals(session_id)")
+
+    # ============ 角色人格体系（v0.12.0）============
+    # 设计要点：人设从 JSON 文件搬进数据库，才能按角色索引、多角色共存。
+    # 固定字段用列（要查询/要索引），长文本用JSON 列（引导是渐进的，拆列会大量留空）。
+
+    # 世界模板：可复用的世界观。新建角色时选一个模板，之后确定下来也能存成新模板。
+    c.execute("""CREATE TABLE IF NOT EXISTS world_templates (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        summary TEXT DEFAULT '',
+        genre TEXT DEFAULT '',          -- 题材：现代都市 / 古代 / 架空修真 / 校园...
+        era TEXT DEFAULT '',            -- 时代与地点
+        factions TEXT DEFAULT '[]',     -- JSON数组：势力/圈层
+        boundaries TEXT DEFAULT '[]',   -- JSON数组：内容边界（能聊/不碰）
+        customs TEXT DEFAULT '[]',      -- JSON数组：日常惯例（影响称呼与说话方式）
+        user_nick TEXT DEFAULT '',      -- 用户在这个世界里被怎么称呼
+        is_builtin INTEGER DEFAULT 0,   -- 内置模板（不可删）
+        created TEXT,
+        updated TEXT
+    )""")
+
+    # 角色人格：可对话人设。支持多角色共存，is_protagonist 标记主角
+    # （v0.17.5：唯一性按 world_scope 判——每个世界各有一个主角，不串门）
+    c.execute("""CREATE TABLE IF NOT EXISTS personas (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        is_protagonist INTEGER DEFAULT 0,    -- 1 = 本世界主角（视角切换的"切回"目标）
+        depth TEXT DEFAULT 'full',           -- full=用户详细说+AI补 / lite=一句话由AI全推
+        world_template_id TEXT DEFAULT '',   -- 引用的世界模板
+        summary TEXT DEFAULT '',             -- 一句话人设概要（lite 档就是这个）
+        age INTEGER DEFAULT 0,
+        birthday TEXT DEFAULT '',
+        occupation TEXT DEFAULT '',
+        core_traits TEXT DEFAULT '[]',       -- JSON数组：性格词组
+        speech_style TEXT DEFAULT '',
+        reply_format TEXT DEFAULT '',
+        likes TEXT DEFAULT '',
+        dislikes TEXT DEFAULT '',
+        bond_origin TEXT DEFAULT '{}',       -- JSON：关系起点（怎么认识、现在什么阶段）
+        intimacy TEXT DEFAULT '{}',          -- JSON：亲密度节奏
+        rules TEXT DEFAULT '[]',             -- JSON数组：规则（带 L0/L1/L2 分级）
+        rule_levels TEXT DEFAULT '{}',        -- JSON：分级含义
+        examples TEXT DEFAULT '[]',          -- JSON数组：语气样例
+        anti_pattern TEXT DEFAULT '',        -- 禁忌清单
+        content_mode TEXT DEFAULT '',
+        memory_priority TEXT DEFAULT '',
+        user_name TEXT DEFAULT '',            -- 用户在这个角色眼里的名字
+        notes TEXT DEFAULT '',
+        created TEXT,
+        updated TEXT
+    )""")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_personas_protagonist ON personas(is_protagonist)")
+
+    # 引导草稿：对话式引导的进度。独立于 sessions（草稿生命周期=角色设计进度，
+    # 一个角色配好后多个会话都能用），支持中断续接。
+    c.execute("""CREATE TABLE IF NOT EXISTS onboarding_drafts (
+        id TEXT PRIMARY KEY,
+        target_name TEXT DEFAULT '',          -- 正在捏的角色（可能还没起名）
+        depth TEXT DEFAULT 'full',            -- full=主角档 / lite=配角档
+        world_template_id TEXT DEFAULT '',   -- 选了哪个世界模板（可直接沿用）
+        collected TEXT DEFAULT '{}',          -- JSON：五层已收集的原始素材
+        current_layer INTEGER DEFAULT 1,      -- 进行到第几层 1-5
+        history TEXT DEFAULT '[]',            -- JSON数组：引导对话原文
+        status TEXT DEFAULT 'active',         -- active=进行中 / done=已落库
+        created TEXT,
+        updated TEXT
+    )""")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_drafts_status ON onboarding_drafts(status)")
+
+    # people 表关联到人格库（老库逐列补齐）
+    for _col, _def in [
+        ("persona_id", "TEXT DEFAULT ''"),     # 关联 personas.id，空=只有人物卡
+        ("role", "TEXT DEFAULT ''"),          # companion=可对话主角 / family=背景人物
+    ]:
+        _cols = [r[1] for r in c.execute("PRAGMA table_info(people)").fetchall()]
+        if _col not in _cols:
+            c.execute(f"ALTER TABLE people ADD COLUMN {_col} {_def}")
+
+    # sessions 表关联人格（会话记住用哪个角色，重开页面能恢复）
+    _scols2 = [r[1] for r in c.execute("PRAGMA table_info(sessions)").fetchall()]
+    if "persona_id" not in _scols2:
+        c.execute("ALTER TABLE sessions ADD COLUMN persona_id TEXT DEFAULT ''")
 
     conn.commit()
 
@@ -418,7 +507,7 @@ def get_all_sessions():
     """
     conn = connect()
     rows = conn.execute(
-        "SELECT id, title, system_prompt, created, updated FROM sessions "
+        "SELECT id, title, system_prompt, created, updated, persona_id, actor, model FROM sessions "
         "ORDER BY created DESC, id DESC"
     ).fetchall()
     return [dict(r) for r in rows]
@@ -515,7 +604,8 @@ def delete_memory_embeddings_by_session(session_id):
 
 
 def delete_session(session_id):
-    """删除会话（消息表、记忆、向量、人物、关系、摘要、状态卡、原文块全部清理，彻底不留残留）"""
+    """删除会话（消息表、记忆、向量、人物、关系、摘要、状态卡、原文块、
+    未完结承诺、场景状态全部清理，彻底不留残留）"""
     conn = connect()
     # 先删向量（memory_embeddings 无 session_id 列，靠关联 memories 删）
     conn.execute(
@@ -536,6 +626,9 @@ def delete_session(session_id):
     )
     conn.execute("DELETE FROM conversation_chunks WHERE session_id = ?", (session_id,))
     conn.execute("DELETE FROM character_proposals WHERE session_id = ?", (session_id,))
+    # 2026-10-13 补齐：未完结承诺、场景状态（漏清导致孤儿数据无限累积）
+    conn.execute("DELETE FROM open_loops WHERE session_id = ?", (session_id,))
+    conn.execute("DELETE FROM scene_states WHERE session_id = ?", (session_id,))
     conn.execute("DELETE FROM sessions WHERE id = ?", (session_id,))
     conn.commit()
     drop_message_table(session_id)
